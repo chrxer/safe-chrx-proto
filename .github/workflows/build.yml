@@ -17,13 +17,16 @@ jobs:
       - uses: actions/checkout@v4
       - name: Launch EC2 instance
         run: |
-          # AMI: Ubuntu Server 22.04 LTS (HVM), SSD Volume Type
-          # 32 vCPU, 64GB RAM, x86_64, 1'200 GB SSD, 10GiB Network, 1.376 USD/hour
+          # https://console.aws.amazon.com/ec2/home/#AMICatalog
+          # ami-0884d2865dbe9de4b: Ubuntu Server 22.04 LTS (HVM), SSD Volume Type 
+          # https://console.aws.amazon.com/ec2/home?region=us-east-2#InstanceTypes:v=3;supportedArchitectures=x86_64;instanceStorageType=ssd;memorySizeGib=%3E%5C=16;defaultCores=%3E%5C=8;totalInstanceStorageSizeGb=%3E%5C=150;sort=default-otherLinux
+          # c5ad.4xlarge: 16 vCPU, 32GB RAM, x86_64, 600 GB SSD, Up to 10GiB Network, 0.688  USD/hour
+          # c5ad.8xlarge: 32 vCPU, 64GB RAM, x86_64, 1'200 GB SSD, 10GiB Network, 1.376 USD/hour
           aws ec2 run-instances \
-            --instance-type c5ad.8xlarge \
+            --instance-type c5ad.4xlarge \
             --image-id ami-0884d2865dbe9de4b \
             --iam-instance-profile Name=chrxer \
-            --instance-initiated-shutdown-behavior stop \
-            --user-data file://build/build.sh \
+            --user-data file://build.sh \
             --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=ChromiumBuild},{Key=GIT_REPO,Value=$GITHUB_REPOSITORY},{Key=GIT_SHA,Value=$GITHUB_SHA}]' \
-            --dry-run
+            --instance-initiated-shutdown-behavior stop # "Terminate", "stop" for testing (don't forget to terminate manually!)
+            # --dry-run # use for 
