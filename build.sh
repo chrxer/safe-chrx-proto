@@ -52,5 +52,5 @@ else
 fi
 
 if [ "$EC2ID" ]; then
-  sudo shutdown -h now
+  echo "sudo shutdown -h now"
 fi
