@@ -12,10 +12,13 @@ Our password manager requires a **master password** when autofilling the first t
 ## Architecture
 ![Architecture](bridge.drawio.svg)
 
+## Roadmap
+See [roadmap](roadmap/)
+
 ## Developers
 Integrated as a school-project \
 [@kaliiiiiiiiii](https://github.com/kaliiiiiiiiii) aka Steve (Single dev) \
-[@The-AnOnym](https://github.com/The-AnOnym)
+[@The-An0nym](https://github.com/The-An0nym)
 
 ## Sponsors
 None yet:(

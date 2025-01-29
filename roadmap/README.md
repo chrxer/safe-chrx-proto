@@ -1,0 +1,4 @@
+- [x] setup EC2 instance startup
+- [ ] setup S3 cache & logging
+- [ ] setup git [webhook](https://docs.github.com/en/webhooks/about-webhooks) for publishing releases
+- [ ] ensure EC2s are automatically terminated

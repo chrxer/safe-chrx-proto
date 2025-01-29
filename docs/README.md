@@ -1,6 +1,5 @@
 ## Setup build instance
 
-
 ### Setup
 Fork this repository
 
@@ -58,3 +57,12 @@ Add the repository secrets for `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
 Go to [EC" security group](https://console.aws.amazon.com/ec2/home#SecurityGroups:) and create a new security group named `chrxer`. \
 Add an inbound rule with `Type:ssh` and select `com.amazonaws.<your-region>.ec2-instance-connect` for `Source` \
 Copy the `security group ID` and add a repository secret with the key `EC2_SECURITY_GROUP_ID`
+
+### Debugging
+You can use [ec2-instance-connect](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-methods.html) for connecting to the instance.
+
+You may uses
+```bash
+tail -f /tmp/build.log
+```
+for retrieving the output of [build.sh](../build.sh)
