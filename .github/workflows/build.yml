@@ -1,11 +1,24 @@
-name: Hello World Dispatch
+name: Build Chromium on EC2
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Allow manual triggering
 
 jobs:
-  say-hello:
+  build-chromium:
     runs-on: ubuntu-latest
     steps:
-      - name: Hello World
-        run: echo "Hello, World!"
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - uses: actions/checkout@v4
+      - name: Launch EC2 instance
+        run: |
+          aws ec2 run-instances \
+            --instance-type c5d.xlarge \
+            --user-data file://build/build.sh \
+            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=ChromiumBuild},{Key=GITHUB_SHA,Value=$GITHUB_SHA}]' \
+            --dry-run
