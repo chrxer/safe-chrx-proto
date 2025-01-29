@@ -6,7 +6,7 @@ Fork this repository
 
 Create a IAM policy in the [AWS console](https://console.aws.amazon.com/iamv2/home#/policies) with the following minimum permissions
 ```json
-{s
+{
 	"Version": "2012-10-17",
 	"Statement": [
 		{
@@ -55,3 +55,6 @@ Create an EC2 [IAM role](https://console.aws.amazon.com/iamv2/home#/roles) named
 Create an [IAM user](https://console.aws.amazon.com/iamv2/home#/users) named with the same policy. \
 Add the repository secrets for `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
 
+Go to [EC" security group](https://console.aws.amazon.com/ec2/home#SecurityGroups:) and create a new security group named `chrxer`. \
+Add an inbound rule with `Type:ssh` and select `com.amazonaws.<your-region>.ec2-instance-connect` for `Source` \
+Copy the `security group ID` and add a repository secret with the key `EC2_SECURITY_GROUP_ID`

@@ -6,16 +6,20 @@ build () {
   echo "Building chromium.."
 }
 
-# ensure curl is installed
-if ! command -v curl &> /dev/null; then
-  sudo apt install -y curl
+EC2ID=$(curl -s -m 5 http://169.254.169.254/latest/meta-data/instance-id)
+if [ $EC2ID ]; then
+  exec > >(tee /tmp/build.log) 2>&1
+fi
+
+# ensure apt is installed
+if ! command -v apt &> /dev/null; then
+  curl https://security.ubuntu.com/ubuntu/pool/main/a/apt/apt_2.9.26_amd64.deb -o apt.deb
+  sudo dpkg -i apt.deb
 fi
 
 EC2ID=$(curl -s -m 5 http://169.254.169.254/latest/meta-data/instance-id)
 if [ $EC2ID ]; then
   echo "Running on AWS, attempting to fetch commit";
-  exec > >(tee /tmp/build.log) 2>&1
-  sudo apt-get update
 
   GITHUB_SHA=$(aws ec2 describe-tags \
     --filters "Name=resource-id,Values=$EC2ID" "Name=key,Values=GIT_SHA" \
