@@ -19,6 +19,8 @@ jobs:
         run: |
           aws ec2 run-instances \
             --instance-type c5d.xlarge \
+            --iam-instance-profile Name=chrxer
+            --instance-initiated-shutdown-behavior stop \
             --user-data file://build/build.sh \
-            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=ChromiumBuild},{Key=GITHUB_SHA,Value=$GITHUB_SHA}]' \
+            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=ChromiumBuild},{Key=GIT_REPO,Value=$GITHUB_REPOSITORY},{Key=GIT_SHA,Value=$GITHUB_SHA}]' \
             --dry-run
