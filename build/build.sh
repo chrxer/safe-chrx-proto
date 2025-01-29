@@ -1,4 +1,6 @@
 #!/bin/bash
+
+set -e
 exec > >(tee /tmp/build.log) 2>&1
 
 sudo apt-get update
@@ -8,7 +10,7 @@ GITHUB_SHA=$(aws ec2 describe-tags \
   --query "Tags[0].Value" \
   --output text)
   
-GIT_REPO$(aws ec2 describe-tags \
+GIT_REPO=$(aws ec2 describe-tags \
   --filters "Name=resource-id,Values=$INSTANCE_ID" "Name=key,Values=GIT_REPO" \
   --query "Tags[0].Value" \
   --output text)
