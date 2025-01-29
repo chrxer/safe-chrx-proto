@@ -38,7 +38,7 @@ if [ $EC2ID ]; then
   cd $GIT_REPO
 
   git init
-  git remote add origin https://github.com/$GIT_REPO
+  git remote add origin $GIT_REPO
   git fetch origin $GITHUB_SHA
   git checkout $GITHUB_SHA
 fi
