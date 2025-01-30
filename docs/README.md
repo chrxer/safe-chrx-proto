@@ -63,6 +63,6 @@ You can use [ec2-instance-connect](https://docs.aws.amazon.com/AWSEC2/latest/Use
 
 You may uses
 ```bash
-tail -f /tmp/build.log
+tail -f -n +1 /tmp/build.log
 ```
 for retrieving the output of [build.sh](../build.sh)
