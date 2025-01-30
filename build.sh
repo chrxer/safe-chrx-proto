@@ -2,8 +2,10 @@
 
 set +e
 LOGFILE=/tmp/build.log
+CHRXER="${HOME}/chrxer"
 
 build () {
+  cd $HOME
   echo "Building chromium.."
   echo "Installing deps.. https://chromium.googlesource.com/chromium/src/+/main/docs/linux/build_instructions.md#Install"
   git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
@@ -22,7 +24,6 @@ TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metad
 
 if [ $TOKEN ]; then
   exec > >(tee $LOGFILE) 2>&1
-  cd ~
   EC2ID=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s -m 5 http://169.254.169.254/latest/meta-data/instance-id)
 fi
 
@@ -63,8 +64,8 @@ if [ $EC2ID ]; then
   }
 
   # fetch correct git commit
-  mkdir -p $GIT_REPO
-  cd $GIT_REPO
+  mkdir -p $CHRXER
+  cd $CHRXER
 
   git init && git remote add origin $GIT_REPO && git fetch origin $GITHUB_SHA && git checkout $GITHUB_SHA
   save-log
