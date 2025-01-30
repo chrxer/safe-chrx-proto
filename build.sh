@@ -68,6 +68,7 @@ if [ $EC2ID ]; then
   # fetch correct git commit
   mkdir -p $CHRXER
   cd $CHRXER
+  echo "downloading repo to $CHRXER"
 
   git init && git remote add origin $GIT_REPO && git fetch origin $GITHUB_SHA && git checkout $GITHUB_SHA
   save-log
