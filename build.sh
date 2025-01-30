@@ -6,6 +6,8 @@ CHRXER="${HOME}/chrxer"
 
 build () {
   cd $HOME
+  sudo apt-get update && sudo apt-get install python3
+  
   echo "Building chromium.."
   echo "Installing deps.. https://chromium.googlesource.com/chromium/src/+/main/docs/linux/build_instructions.md#Install"
   git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
@@ -32,7 +34,6 @@ if [ $EC2ID ]; then
   
   REGION=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s -m 5 http://169.254.169.254/latest/meta-data/placement/region)
   sudo snap install aws-cli --classic
-  sudo apt-get update && sudo apt-get install python3
   aws configure set default.region $REGION
 
   GITHUB_SHA=$(aws ec2 describe-tags \
