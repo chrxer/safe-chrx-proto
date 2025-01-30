@@ -4,7 +4,17 @@ set +e
 
 build () {
   echo "Building chromium.."
+  echo "Installing deps.. https://chromium.googlesource.com/chromium/src/+/main/docs/linux/build_instructions.md#Install"
   git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+  export PATH="$(pwd)/depot_tools:$PATH"
+  mkdir ~/chromium && cd ~/chromium
+  fetch --no-history --nohooks chromium
+  cd src
+  ./build/install-build-deps.sh
+  gclient runhooks
+
+  echo "Compiling chromium release now"
+  gn gen out/Release --args="is_debug=false is_official_build=true symbol_level=0"
 }
 
 TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300"`
