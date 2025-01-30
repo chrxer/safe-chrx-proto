@@ -16,6 +16,7 @@ jobs:
 
       - uses: actions/checkout@v4
       - name: Launch EC2 instance
+        shell: bash
         run: |
           # https://console.aws.amazon.com/ec2/home/#AMICatalog
           # ami-0884d2865dbe9de4b: Ubuntu Server 22.04 LTS (HVM), SSD Volume Type 
@@ -26,10 +27,11 @@ jobs:
           # c5ad.8xlarge: 32 vCPU, 64GB RAM, x86_64, 1'200 GB SSD, 10GiB Network, 1.376 USD/hour
           #
           # --instance-initiated-shutdown-behavior "terminate", "stop" for testing (don't forget to terminate manually!)
+          SEC_GROUP_ID=$(aws ec2 describe-security-groups --group-names chrxer --query 'SecurityGroups[*].[GroupId]' --output text)
           aws ec2 run-instances \
             --instance-type t3a.medium \
             --image-id ami-0884d2865dbe9de4b \
-            --security-group-ids ${{ secrets.EC2_SECURITY_GROUP_ID }} \
+            --security-group-ids $SEC_GROUP_ID \
             --iam-instance-profile Name=chrxer \
             --user-data file://build.sh \
             --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=ChromiumBuild},{Key=GIT_REPO,Value=${{ github.server_url }}/${{ github.repository }}},{Key=GIT_SHA,Value=${{ github.sha }}}]' \
