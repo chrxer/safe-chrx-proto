@@ -18,6 +18,7 @@ jobs:
       - name: Launch EC2 instance
         shell: bash
         run: |
+          BUCKET=amzn-s3-chrxer-bucket-v1
           # https://console.aws.amazon.com/ec2/home/#AMICatalog
           # ami-0884d2865dbe9de4b: Ubuntu Server 22.04 LTS (HVM), SSD Volume Type 
           #
@@ -35,6 +36,6 @@ jobs:
             --security-group-ids $SEC_GROUP_ID \
             --iam-instance-profile Name=chrxer \
             --user-data file://build.sh \
-            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=ChromiumBuild},{Key=GIT_REPO,Value=${{ github.server_url }}/${{ github.repository }}},{Key=GIT_SHA,Value=${{ github.sha }}}]' \
+            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=ChromiumBuild},{Key=BUCKET, Value=$BUCKET},{Key=GIT_REPO,Value=${{ github.server_url }}/${{ github.repository }}},{Key=GIT_SHA,Value=${{ github.sha }}}]' \
             --instance-initiated-shutdown-behavior stop \
             > /dev/null
