@@ -19,7 +19,8 @@ Create a IAM policy in the [AWS console](https://console.aws.amazon.com/iamv2/ho
 				"ec2:StopInstances",
 				"ec2:TerminateInstances",
 				"ec2:DescribeInstances",
-				"ec2:DescribeInstanceStatus"
+				"ec2:DescribeInstanceStatus",
+				"ec2:DescribeSecurityGroups"
 			],
 			"Resource": "*"
 		},
