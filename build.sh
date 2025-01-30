@@ -21,8 +21,9 @@ build () {
 TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300"`
 
 if [ $TOKEN ]; then
-  EC2ID=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s -m 5 http://169.254.169.254/latest/meta-data/instance-id)
   exec > >(tee $LOGFILE) 2>&1
+  cd ~
+  EC2ID=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s -m 5 http://169.254.169.254/latest/meta-data/instance-id)
 fi
 
 if [ $EC2ID ]; then
@@ -54,10 +55,7 @@ if [ $EC2ID ]; then
   echo XXXXXXXXXXXXXXX
 
    if ! aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
-      aws s3api create-bucket \
-        --bucket $BUCKET_NAME \
-        --region $REGION \
-        --create-bucket-configuration LocationConstraint=$REGION
+      aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION
   fi
 
   save-log () {
