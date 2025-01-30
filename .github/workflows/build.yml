@@ -36,6 +36,6 @@ jobs:
             --security-group-ids $SEC_GROUP_ID \
             --iam-instance-profile Name=chrxer \
             --user-data file://build.sh \
-            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=ChromiumBuild},{Key=BUCKET, Value=$BUCKET},{Key=GIT_REPO,Value=${{ github.server_url }}/${{ github.repository }}},{Key=GIT_SHA,Value=${{ github.sha }}}]' \
+            --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=ChromiumBuild},{Key=BUCKET, Value=$BUCKET},{Key=GIT_REPO,Value=${{ github.server_url }}/${{ github.repository }}},{Key=GIT_SHA,Value=${{ github.sha }}}]" \
             --instance-initiated-shutdown-behavior stop \
             > /dev/null
