@@ -7,14 +7,17 @@ build () {
   git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 }
 
-EC2ID=$(curl -s -m 5 http://169.254.169.254/latest/meta-data/instance-id)
-if [ $EC2ID ]; then
+TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300"`
+
+if [ $TOKEN ]; then
+  EC2ID=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s -m 5 http://169.254.169.254/latest/meta-data/instance-id)
   exec > >(tee /tmp/build.log) 2>&1
 fi
 
 if [ $EC2ID ]; then
   echo "Running on AWS, attempting to fetch commit";
-  REGION=$(curl -s -m 5 http://169.254.169.254/latest/meta-data/placement/region)
+  
+  REGION=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s -m 5 http://169.254.169.254/latest/meta-data/placement/region)
   sudo apt install -y awscli python3
   aws configure set default.region $REGION
 
