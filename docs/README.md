@@ -66,3 +66,8 @@ You may uses
 tail -f -n +1 /tmp/build.log
 ```
 for retrieving the output of [build.sh](../build.sh)
+
+### Retrieve log from S3
+```bash
+aws s3 cp --quiet s3://amzn-s3-chrxer-bucket-v1/build.log /dev/stdout
+```
