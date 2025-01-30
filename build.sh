@@ -28,7 +28,7 @@ if [ $EC2ID ]; then
   echo "Running on AWS, attempting to fetch commit";
   
   REGION=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s -m 5 http://169.254.169.254/latest/meta-data/placement/region)
-  sudo apt install -y awscli python3
+  sudo snap install aws-cli --classic
   aws configure set default.region $REGION
 
   GITHUB_SHA=$(aws ec2 describe-tags \
