@@ -6,9 +6,8 @@ set +e
 LOGFILE="/tmp/build.log"
 
 build() {
-  
-
-  WRK=$(pwd)  # working directory
+  # running inside chrxer repo directory root
+  WRK=$(cwd)  # working directory
   echo "Building Chromium..."
   echo "Downloading dependencies... https://chromium.googlesource.com/chromium/src/+/main/docs/linux/build_instructions.md#Install"
   
@@ -61,9 +60,13 @@ if [ -n "$EC2ID" ]; then
   if ! aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
     aws s3api create-bucket --bucket "$BUCKET_NAME" --region "$REGION"
   fi
+  
+  # install deps
+  sudo apt-get update && sudo apt-get install -y python3 ccache
 
   # Set up SSD and ccache only on EC2
   if lsblk | grep -q "nvme1n1"; then
+    # use nvme for ccache if available
     sudo mkfs -t xfs /dev/nvme1n1
     sudo mkdir -p /data
     sudo mount /dev/nvme1n1 /data
@@ -73,6 +76,8 @@ if [ -n "$EC2ID" ]; then
   if [ -d /data ]; then
     export CCACHE_DIR="/data/.ccache"
     mkdir -p "$CCACHE_DIR"
+  else
+    export CCACHE_DIR="$HOME/.cache/ccache"
   fi
 
   save-log() {
@@ -93,7 +98,6 @@ echo "Running on $(uname -a)"
 if [ ! -f build.sh ]; then
   echo "Git repo not properly initialized."
 else
-  sudo apt-get update && sudo apt-get install -y python3 ccache
   if [ -n "$EC2ID" ]; then
     sudo -u ubuntu build
     echo "Uploading ccache to S3..."
