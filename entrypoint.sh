@@ -41,6 +41,7 @@ if [ -n "$EC2ID" ]; then
     sudo mkdir -p /data
     sudo mount /dev/nvme1n1 /data
     sudo chown -R ubuntu:ubuntu /data
+    cd /data
   fi
 
   if [ -d /data ]; then
