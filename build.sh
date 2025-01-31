@@ -1,10 +1,12 @@
 #!/bin/bash
 
+# Requires running on Ubuntu, (default user:ubuntu)
+
 set +e
-LOGFILE="/tmp/log"
+LOGFILE="/tmp/build.log"
 
 build() {
-  sudo apt-get update && sudo apt-get install -y python3 ccache
+  
 
   WRK=$(pwd)  # working directory
   echo "Building Chromium..."
@@ -65,7 +67,7 @@ if [ -n "$EC2ID" ]; then
     sudo mkfs -t xfs /dev/nvme1n1
     sudo mkdir -p /data
     sudo mount /dev/nvme1n1 /data
-    sudo chown -R ec2-user:ec2-user /data
+    sudo chown -R ubuntu:ubuntu /data
   fi
 
   if [ -d /data ]; then
@@ -91,8 +93,9 @@ echo "Running on $(uname -a)"
 if [ ! -f build.sh ]; then
   echo "Git repo not properly initialized."
 else
+  sudo apt-get update && sudo apt-get install -y python3 ccache
   if [ -n "$EC2ID" ]; then
-    sudo -u ec2-user build
+    sudo -u ubuntu build
     echo "Uploading ccache to S3..."
     save-log
     aws s3 sync "$CCACHE_DIR/" "s3://$BUCKET_NAME/ccache/" --quiet
