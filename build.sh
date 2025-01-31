@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # running inside chrxer repo directory root
 WRK=$(cwd)  # working directory
 echo "Building Chromium..."
