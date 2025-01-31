@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # running inside chrxer repo directory root
-WRK=$(cwd)  # working directory
+WRK=$(pwd)  # working directory
 echo "Building Chromium..."
 echo "Downloading dependencies... https://chromium.googlesource.com/chromium/src/+/main/docs/linux/build_instructions.md#Install"
 
