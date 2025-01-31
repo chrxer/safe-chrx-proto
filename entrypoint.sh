@@ -40,7 +40,6 @@ if [ -n "$EC2ID" ]; then
     sudo mkfs -t xfs /dev/nvme1n1
     sudo mkdir -p /data
     sudo mount /dev/nvme1n1 /data
-    sudo chown -R ubuntu:ubuntu /data
     cd /data
   fi
 
@@ -62,7 +61,7 @@ if [ -n "$EC2ID" ]; then
   echo "Downloading repo to $CHROMIUM"
   git init && git remote add origin "$GIT_REPO" && git fetch origin "$GITHUB_SHA" && git checkout "$GITHUB_SHA"
   save-log
-  sudo chown -R ubuntu:ubuntu /data
+  sudo chown -R ubuntu:ubuntu $(cwd) # git: detected dubious ownership in repository at -> don't run before git
 fi
 
 echo "Running on $(uname -a)"
