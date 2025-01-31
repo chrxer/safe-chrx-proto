@@ -5,36 +5,6 @@
 set +e
 LOGFILE="/tmp/build.log"
 
-build() {
-  # running inside chrxer repo directory root
-  WRK=$(cwd)  # working directory
-  echo "Building Chromium..."
-  echo "Downloading dependencies... https://chromium.googlesource.com/chromium/src/+/main/docs/linux/build_instructions.md#Install"
-  
-  git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-  export PATH="$WRK/depot_tools:$PATH"
-
-  CHROMIUM="$WRK/chromium"
-  mkdir -p "$CHROMIUM" && cd "$CHROMIUM"
-  fetch --no-history --nohooks chromium
-
-  # Configure ccache
-  ccache --max-size=30G
-  export CCACHE_CPP2=yes
-  export CCACHE_SLOPPINESS=time_macros
-
-  # Build Chromium
-  cd "$CHROMIUM/src"
-  ./build/install-build-deps.sh
-  gclient runhooks
-
-  echo "Compiling Chromium release now"
-  gn gen out/Release --args='is_debug=false is_official_build=true symbol_level=0 cc_wrapper="ccache"'
-  ninja -C out/Release chrome
-
-  cd "$WRK"
-}
-
 # Fetch EC2 instance metadata
 TOKEN=$(curl -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 300" -s -m 3 "http://169.254.169.254/latest/api/token" )
 
@@ -91,6 +61,7 @@ if [ -n "$EC2ID" ]; then
   echo "Downloading repo to $CHROMIUM"
   git init && git remote add origin "$GIT_REPO" && git fetch origin "$GITHUB_SHA" && git checkout "$GITHUB_SHA"
   save-log
+  sudo chown -R ubuntu:ubuntu /data
 fi
 
 echo "Running on $(uname -a)"
@@ -98,13 +69,14 @@ echo "Running on $(uname -a)"
 if [ ! -f build.sh ]; then
   echo "Git repo not properly initialized."
 else
+  sudo chmod +x ./build.sh
   if [ -n "$EC2ID" ]; then
-    sudo -u ubuntu build
+    sudo -u ubuntu ./build.sh
     echo "Uploading ccache to S3..."
     save-log
     aws s3 sync "$CCACHE_DIR/" "s3://$BUCKET_NAME/ccache/" --quiet
   else
-    build
+    ./build.sh
   fi
 fi
 
