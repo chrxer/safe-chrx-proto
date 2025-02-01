@@ -1,9 +1,8 @@
 #!/bin/bash
 
-# Requires running on Ubuntu, (default user:ubuntu)
-
 set +e
 LOGFILE="/tmp/build.log"
+USER=$(awk -F: '$3 >= 1000 && $3 < 60000 {print $1; exit}' /etc/passwd)
 
 # Fetch EC2 instance metadata
 TOKEN=$(curl -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 300" -s -m 3 "http://169.254.169.254/latest/api/token" )
@@ -37,10 +36,7 @@ if [ -n "$EC2ID" ]; then
   # Set up SSD and ccache only on EC2
   if lsblk | grep -q "nvme1n1"; then
     # use nvme for ccache if available
-    sudo mkfs -t xfs /dev/nvme1n1
-    sudo mkdir -p /data
-    sudo mount /dev/nvme1n1 /data
-    cd /data
+    sudo mkfs -t xfs /dev/nvme1n1 && sudo mkdir -p /data && sudo mount /dev/nvme1n1 /data && cd /data
   fi
 
   if [ -d /data ]; then
@@ -61,22 +57,22 @@ if [ -n "$EC2ID" ]; then
   echo "Downloading repo to $CHROMIUM"
   git init && git remote add origin "$GIT_REPO" && git fetch origin "$GITHUB_SHA" && git checkout "$GITHUB_SHA"
   save-log
-  sudo chown -R ubuntu:ubuntu $(pwd) # git: detected dubious ownership in repository at -> don't run before git
+  sudo chown -R $USER:$USER $(pwd) # git: detected dubious ownership in repository at -> don't run before git
+else
+  sudo apt-get install -y python3 ccache
 fi
 
 echo "Running on $(uname -a)"
 
-if [ ! -f build.sh ]; then
+if [ ! -f entrypoint.sh ]; then
   echo "Git repo not properly initialized."
 else
-  sudo chmod +x ./build.sh
+  sudo chmod +x ./build/
+  sudo ./build/deps.sh && sudo -u $USER env "PATH=$PATH" "./build/build.sh"
   if [ -n "$EC2ID" ]; then
-    sudo -u ubuntu ./build.sh
     echo "Uploading ccache to S3..."
     save-log
     aws s3 sync "$CCACHE_DIR/" "s3://$BUCKET_NAME/ccache/" --quiet
-  else
-    ./build.sh
   fi
 fi
 

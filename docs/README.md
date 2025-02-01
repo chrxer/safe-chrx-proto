@@ -1,5 +1,5 @@
 ## Setup build instance
-Building requires running on ubuntu, with the default use "ubuntu"
+Building requires running on a debian-based distro (ubuntu recommended)
 
 ### Setup
 Fork this repository

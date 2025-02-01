@@ -1,2 +1,3 @@
-chromium
-depot_tools
+chromium/
+chromium_patched/
+depot_tools/
