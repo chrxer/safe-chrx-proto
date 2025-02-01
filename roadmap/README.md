@@ -1,5 +1,7 @@
+## Priority
 - [x] setup EC2 instance startup
-- [ ] setup S3 cache & logging
+- [x] setup S3 Ccache & log upload
+- [ ] first compillation of chromium
 - [ ] setup?publishing releases using fine-grained tokens
 - [ ] ensure EC2s are automatically terminated after n hours
 
