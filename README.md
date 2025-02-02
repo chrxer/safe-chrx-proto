@@ -27,8 +27,14 @@ c5ad.xlarge:
     150 GB SSD, 
     Up to 10GiB Network, 
     ~0.172  USD/hour
+
+All deps installed: 12~14 min.
+Building (estimated): 3.5 ~ 4.5 h ~ 0.7 USD
+CPU: 95% ~ 99% during compillation
+Network: ~ 700 MBytes/s during deps
+Disk max: Read:
 ```
-All deps installed: ~ 14 min.
+
 
 ## Developers
 Integrated as a school-project \
