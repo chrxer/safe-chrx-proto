@@ -3,10 +3,6 @@ name: Build Chromium on EC2
 on:
   workflow_dispatch: # Allow manual triggering
 
-permissions:
-      id-token: write
-      contents: read
-
 jobs:
   build-chromium:
     runs-on: ubuntu-latest
