@@ -40,9 +40,11 @@ if [ -n "$EC2ID" ]; then
   fi
 
   if [ -d /data ]; then
-    export CCACHE_DIR="/data/.ccache"
-    UHOME=$(sudo -u $USER "echo \$HOME")
-    mount --bind "$CCACHE_DIR" "$UHOME/.cache/ccache/"
+    export CCACHE_DIR="/data/ccache"
+    UHOME=$(su $USER -c 'echo $HOME')
+    UCCACHE=$UHOME/.cache/ccache/
+    mkdir -p "$UCCACHE" "$CCACHE_DIR"
+    mount --bind "$CCACHE_DIR" "$UCCACHE"
     mkdir -p "$CCACHE_DIR"
   else
     export CCACHE_DIR="$HOME/.cache/ccache"
@@ -69,7 +71,6 @@ echo "Running on $(uname -a)"
 if [ ! -f entrypoint.sh ]; then
   echo "Git repo not properly initialized."
 else
-  sudo chmod +x ./build/
   sudo make deps && \
     sudo -u $USER env "PATH=$PATH" make patch && \
     sudo -u $USER env "PATH=$PATH" make build
