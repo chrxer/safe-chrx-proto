@@ -1,15 +1,24 @@
 #!/bin/bash
 
+set -e
+
 WRK=$(pwd)  # working directory
-DEPOT="$WRK/depot_tools"
 CHROMIUM="$WRK/chromium"
-PATCHED="$WRK/chromium_patched"
 PATCH="$WRK/patch"
+export PATH="$WRK/depot_tools:$PATH"
 
-if [ ! -d $PATCHED ]; then
-    cp -rs $CHROMIUM $PATCHED
-fi
+# revert git to latest
 
-echo "Copying all files in patch/chromium to chromium_patched"
-rm $PATCHED/.gclient
-cp -H $PATCH/chromium/.gclient $PATCHED/.gclient
+cd "$CHROMIUM/src"
+set +e
+git clean -d --force && git reset --hard --recurse-submodules
+set -e
+
+echo "Patching chromium.."
+cp -a "$PATCH/chromium/." $CHROMIUM/
+echo "patched chromium"
+gclient sync
+
+cd $WRK
+
+set +e

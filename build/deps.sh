@@ -24,11 +24,14 @@ if [ ! -d $CHROMIUM ]; then
     sudo -u $USER env "PATH=$PATH" fetch --no-history --nohooks chromium
     cd "$CHROMIUM/src"
 else
-    echo "chromium src present, syncing.."
+    echo "chromium src present, syncing & cleaning.."
     cd "$CHROMIUM/src"
     
-    # sudo -u $USER env "PATH=$PATH" git rebase-update
-    sudo -u $USER env "PATH=$PATH" gclient sync
+    git config http.postBuffer 524288000
+    git config protocol.version 2
+    sudo -u $USER env "PATH=$PATH" git clean -d --force && git reset --hard --recurse-submodules
+    sudo -u $USER env "PATH=$PATH" git rebase-update --current
+    sudo -u $USER env "PATH=$PATH" gclient sync --reset
 fi
 sudo "$CHROMIUM/src/build/install-build-deps.sh"
 cd $WRK

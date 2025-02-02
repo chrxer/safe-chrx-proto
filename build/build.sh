@@ -5,14 +5,8 @@ set -e
 WRK=$(pwd)  # working directory
 DEPOT="$WRK/depot_tools"
 CHROMIUM="$WRK/chromium"
-PATCHED="$WRK/chromium_patched"
 
 export PATH="$DEPOT:$PATH"
-
-if [ ! -d $PATCHED ]; then
-    "$WRK/build/patch.sh"
-fi
-
 
 echo "Configuring ccache"
 ccache --max-size=30G
@@ -20,11 +14,13 @@ export CCACHE_CPP2=yes
 export CCACHE_SLOPPINESS=time_macros
 
 # Build Chromium
-cd "$PATCHED/src"
+cd "$CHROMIUM/src"
 
-echo "Building Chromium release now"
+echo "gn gen Chromium release.."
 gn gen out/Release --args='is_debug=false is_official_build=true symbol_level=0 cc_wrapper="ccache"'
+echo "autoninja .."
 autoninja -C out/Release chrome
+echo "Chromium build complete"
 
 cd "$WRK"
 set +e

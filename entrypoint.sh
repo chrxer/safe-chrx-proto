@@ -68,11 +68,20 @@ if [ ! -f entrypoint.sh ]; then
   echo "Git repo not properly initialized."
 else
   sudo chmod +x ./build/
-  sudo ./build/deps.sh && sudo -u $USER env "PATH=$PATH" "./build/build.sh"
+  sudo ./build/deps.sh && sudo -u $USER env "PATH=$PATH" "./build/patch.sh" && sudo -u $USER env "PATH=$PATH" "./build/build.sh"
   if [ -n "$EC2ID" ]; then
+
+    echo "Uploading chrome to S3..."
+    if ! aws s3 ls "s3://$BUCKET_NAME/releases/" > /dev/null 2>&1; then
+      echo "Directory 'releases' does not exist, creating it..."
+      aws s3api put-object --bucket "$BUCKET_NAME" --key "releases/"
+    fi
+    aws s3 sync "chromium/src/out/Release/chrome" "s3://$BUCKET_NAME/ccache/" --quiet
+    
+    save-log
     echo "Uploading ccache to S3..."
     save-log
-    aws s3 sync "$CCACHE_DIR/" "s3://$BUCKET_NAME/ccache/" --quiet
+    aws s3 sync "$CCACHE_DIR/" "s3://$BUCKET_NAME/releases/$GITHUB_SHA" --quiet
   fi
 fi
 

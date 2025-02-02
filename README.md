@@ -15,6 +15,9 @@ Our password manager requires a **master password** when autofilling the first t
 ## Roadmap
 See [roadmap](roadmap/)
 
+## Building
+See [build](build/)
+
 ## Developers
 Integrated as a school-project \
 [@kaliiiiiiiiii](https://github.com/kaliiiiiiiiii) aka Steve (Single dev) \
