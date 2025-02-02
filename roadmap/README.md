@@ -2,7 +2,7 @@
 - [x] setup EC2 instance startup
 - [x] setup S3 Ccache & log upload
 - [x] first ok compillation start//process of chromium
-- [x] specify specific chromium version [](https://chromiumdash.appspot.com/releases?platform=Linux)
+- [x] specify specific chromium version [chromiumdash.appspot.com/releases](https://chromiumdash.appspot.com/releases?platform=Linux)
 ```bash
  df -h /home/ubuntu/.cache/ccache/
 Filesystem      Size  Used Avail Use% Mounted on
