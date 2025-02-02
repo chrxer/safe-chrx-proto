@@ -64,11 +64,23 @@ Add an inbound rule with `Type:ssh` and select `com.amazonaws.<your-region>.ec2-
 ### Debugging
 You can use [ec2-instance-connect](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-methods.html) for connecting to the instance.
 
+Enter build directory
+```bash
+cd /data
+```
+
 You may uses
 ```bash
 tail -f -n +1 /tmp/build.log
 ```
 for retrieving the output of [build.sh](../build.sh)
+
+Free space on SSD
+```bash
+df -h /data
+```
+
+Size stats for chromium source
 
 ### Retrieve log from S3
 ```bash

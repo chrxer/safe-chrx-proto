@@ -18,6 +18,18 @@ See [roadmap](roadmap/)
 ## Building
 See [build](build/)
 
+Build time without Ccache on:
+```
+c5ad.xlarge:  
+    4 vCPU, 
+    8GB RAM, 
+    x86_64, 
+    150 GB SSD, 
+    Up to 10GiB Network, 
+    ~0.172  USD/hour
+```
+All deps installed: ~ 14 min.
+
 ## Developers
 Integrated as a school-project \
 [@kaliiiiiiiiii](https://github.com/kaliiiiiiiiii) aka Steve (Single dev) \
