@@ -1,5 +1,5 @@
 set -e
-WRK=$(pwd)  # working directory
+WRK=$(realpath $(dirname $(dirname "$0")))
 CHROMIUM="$WRK/chromium"
 export PATH="$WRK/depot_tools:$PATH"
 
