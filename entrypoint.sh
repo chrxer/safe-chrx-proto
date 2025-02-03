@@ -87,12 +87,12 @@ else
       aws s3api put-object --bucket "$BUCKET_NAME" --key "releases/$VERSION"
     fi
 
-    aws s3 sync "chromium/src/out/Release/chrome" "s3://$BUCKET_NAME/ccache/" --quiet
+    aws s3 sync "chromium/src/out/Release/chrome" "s3://$BUCKET_NAME/releases/$VERSION/$GITHUB_SHA" --quiet
     
     save-log
     echo "Uploading ccache to S3..."
     save-log
-    aws s3 sync "$CCACHE_DIR/" "s3://$BUCKET_NAME/releases/$VERSION/$GITHUB_SHA" --quiet
+    aws s3 sync "$CCACHE_DIR/" "s3://$BUCKET_NAME/ccache/" --quiet
   fi
 fi
 
