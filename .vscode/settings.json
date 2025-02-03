@@ -1,11 +1,11 @@
 {
-    "files.associations": {
-        "*/.gclient":"python"
-    },
-    "terminal.integrated.env.linux": {
-        "PATH":"${workspaceFolder}/depot_tools:${env:PATH}"
-    },
-    "files.exclude": {
-     "**/.git": false
-}
+  "files.associations": {
+    "*/.gclient": "python"
+  },
+  "terminal.integrated.env.linux": {
+    "PATH": "${workspaceFolder}/depot_tools:${env:PATH}"
+  },
+  "files.exclude": {
+    "**/.git": false
+  }
 }
