@@ -99,7 +99,7 @@ else
 
     # push release
     echo "Uploading release.."
-    tar -czf "$TMP/release.tar.gz" -C "chromium/src/out/Release/chrome"
+    tar -czf "$TMP/release.tar.gz" -C "chromium/src/out/Release/"
     aws s3 cp "$TMP/release.tar.gz" "s3://$BUCKET_NAME/releases/$VERSION/$GIT_SHA.release.tar.gz" --quiet
     
     save-log
