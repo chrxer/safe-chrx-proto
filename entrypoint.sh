@@ -93,14 +93,14 @@ else
     if ! aws s3 ls "s3://$BUCKET_NAME/releases/" > /dev/null 2>&1; then
       aws s3api put-object --bucket "$BUCKET_NAME" --key "releases/"
     fi
-    if ! aws s3 ls "s3://$BUCKET_NAME/releases"; then
+    if ! aws s3 ls "s3://$BUCKET_NAME/releases/$VERSION" > /dev/null 2>&1; then
       aws s3api put-object --bucket "$BUCKET_NAME" --key "releases/$VERSION"
     fi
 
     # push release
     echo "Uploading release.."
-    tar -czf "$TMP/release.tar.gz" -C "chromium/src/out/Release/"
-    aws s3 cp "$TMP/release.tar.gz" "s3://$BUCKET_NAME/releases/$VERSION/$GIT_SHA.release.tar.gz" --quiet
+    tar -czf "$TMP/release.tar.gz" "chromium/src/out/Release/"
+    aws s3 cp "$TMP/release.tar.gz" "s3://$BUCKET_NAME/releases/$VERSION/$GIT_SHA.release.tar.gz"
     
     save-log
     
@@ -108,9 +108,9 @@ else
       echo "Uploading ccache to S3..."
       
       echo "Creating ccache archive..."
-      tar -czf "$TMP/ccache.tar.gz" -C "$CCACHE_DIR"
+      tar -czf "$TMP/ccache.tar.gz" "$CCACHE_DIR"
       echo "Uploading ccache to S3..."
-      aws s3 cp "$TMP/ccache.tar.gz" "s3://$BUCKET_NAME/ccache.tar.gz" --quiet
+      aws s3 cp "$TMP/ccache.tar.gz" "s3://$BUCKET_NAME/ccache.tar.gz"
     fi
     
   fi
