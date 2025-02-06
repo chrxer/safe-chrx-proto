@@ -32,6 +32,13 @@ CPU: ~ 99% during compillation
 ~4h -> 2.8 USD
 ```
 
+File sizes (131.0.6778.139)
+```
+Sources: 24G (downloaded from google server)
+Ccache:  3.4G (tar.gz archive => S3)
+Release: 2.1G (tar.gz archive => S3)
+```
+
 ## Developers
 Integrated as a school-project \
 [@kaliiiiiiiiii](https://github.com/kaliiiiiiiiii) aka Steve (Single dev) \
