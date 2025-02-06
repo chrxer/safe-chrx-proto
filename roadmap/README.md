@@ -8,10 +8,12 @@
 Filesystem      Size  Used Avail Use% Mounted on
 /dev/root       6.8G  5.8G  987M  86% /
 ```
-- [ ] fix ccache location (use disc, not EBS) [maybe ok]
-- [ ] first succesfull compillation
+- [x] fix ccache location (use disc, not EBS) [maybe ok]
+- [x] first succesfull compillation
+- [ ] test ccache speedup
+- [ ] build `.deb` package based on the official [chromium](https://salsa.debian.org/chromium-team/chromium/) debian source (patch `.gn` files using [gn_ast.py](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/build/gn_ast/gn_ast.py)
 - [ ] setup publishing releases using fine-grained tokens
-- [ ] ensure EC2s are automatically terminated after n hours
+- [ ] ensure EC2s are automatically terminated after build or n hours
 
 ## Optimization 
 - [ ] Use [OICD](https://github.com/aws-actions/configure-aws-credentials?tab=readme-ov-file#oidc) for authenticating to AWS
