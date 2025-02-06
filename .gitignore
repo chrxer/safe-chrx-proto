@@ -1,4 +1,5 @@
 chromium/
 chromium_patched/
 depot_tools/
+chromiumrelease
 !patch/chromium

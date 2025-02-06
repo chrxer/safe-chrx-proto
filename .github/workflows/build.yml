@@ -33,7 +33,7 @@ jobs:
           SEC_GROUP_ID=$(aws ec2 describe-security-groups --group-names chrxer --query 'SecurityGroups[*].[GroupId]' --output text)
           AMI=$(aws ssm get-parameters --names /aws/service/canonical/ubuntu/server/24.04/stable/current/amd64/hvm/ebs-gp3/ami-id --query 'Parameters[0].Value' --output text)
           aws ec2 run-instances \
-            --instance-type c5ad.2xlarge \
+            --instance-type c5ad.4xlarge \
             --image-id $AMI \
             --security-group-ids $SEC_GROUP_ID \
             --iam-instance-profile Name=chrxer \

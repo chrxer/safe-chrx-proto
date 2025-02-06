@@ -19,16 +19,20 @@ if [ -n "$EC2ID" ]; then
   sudo snap install aws-cli --classic
   aws configure set default.region "$REGION"
 
-  GITHUB_SHA=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$EC2ID" "Name=key,Values=GIT_SHA" --query "Tags[0].Value" --output text)
+  GIT_SHA=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$EC2ID" "Name=key,Values=GIT_SHA" --query "Tags[0].Value" --output text)
   GIT_REPO=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$EC2ID" "Name=key,Values=GIT_REPO" --query "Tags[0].Value" --output text)
   BUCKET_NAME=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$EC2ID" "Name=key,Values=BUCKET" --query "Tags[0].Value" --output text)
 
   echo "Repository: $GIT_REPO"
-  echo "Commit SHA: $GITHUB_SHA"
+  echo "Commit SHA: $GIT_SHA"
 
+  # S3 bucket setup
   if ! aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
     aws s3api create-bucket --bucket "$BUCKET_NAME" --region "$REGION"
   fi
+  save-log() {
+    aws s3 cp "$LOGFILE" "s3://$BUCKET_NAME/build.log"
+  }
   
   # install deps
   sudo apt-get update && sudo apt-get install -y python3 ccache make
@@ -39,29 +43,33 @@ if [ -n "$EC2ID" ]; then
     sudo mkfs -t xfs /dev/nvme1n1 && sudo mkdir -p /data && sudo mount /dev/nvme1n1 /data && cd /data
   fi
 
-  if [ -d /data ]; then
-    export CCACHE_DIR="/data/ccache"
-    UHOME=$(su $USER -c 'echo $HOME')
-    UCCACHE=$UHOME/.cache/ccache/
-    mkdir -p "$UCCACHE" "$CCACHE_DIR"
-    mount --bind "$CCACHE_DIR" "$UCCACHE"
-    mkdir -p "$CCACHE_DIR"
-  else
-    export CCACHE_DIR="$HOME/.cache/ccache"
-  fi
-
-  save-log() {
-    aws s3 cp "$LOGFILE" "s3://$BUCKET_NAME/build.log"
-  }
-
-  # Restore ccache from S3 before building
-  echo "Fetching ccache from S3..."
-  aws s3 sync "s3://$BUCKET_NAME/ccache/" "$CCACHE_DIR/" --quiet
+  
 
   echo "Downloading repo to $CHROMIUM"
-  git init && git remote add origin "$GIT_REPO" && git fetch origin "$GITHUB_SHA" && git checkout "$GITHUB_SHA"
+  git init && git remote add origin "$GIT_REPO" && git fetch origin "$GIT_SHA" && git checkout "$GIT_SHA"
   save-log
-  sudo chown -R $USER:$USER $(pwd) # git: detected dubious ownership in repository at -> don't run before git
+  sudo chown -R $USER:$USER $(pwd)
+
+  if [ -d /data ]; then
+    # setup data dir
+    TMP="/data/tmp"
+    CCACHE_DIR="/data/ccache"
+
+    UHOME=$(su $USER -c 'echo $HOME')
+    UCCACHE=$UHOME/.cache/ccache/
+
+    sudo -u $USER env "PATH=$PATH" mkdir -p "$TMP" "$CCACHE_DIR" "$UCCACHE"
+    mount --bind "$CCACHE_DIR" "$UCCACHE"
+
+    if aws s3 ls "s3://$BUCKET_NAME/ccache.tar.gz" --quiet; then
+        echo "Fetching ccache from S3..."
+        sudo -u $USER env "PATH=$PATH" aws s3 cp "s3://$BUCKET_NAME/ccache.tar.gz" "$TMP/ccache.tar.gz" --quiet
+
+        echo "Extracting ccache..."
+        sudo -u $USER env "PATH=$PATH" tar -xzf "$TMP/ccache.tar.gz" -C "$CCACHE_DIR"
+        rm -f "$TMP/ccache.tar.gz"
+    fi
+  fi
 else
   sudo apt-get install -y python3 ccache
 fi
@@ -80,19 +88,30 @@ else
     echo "Uploading chrome to S3..."
     
     VERSION=$(cat "chromium.version")
+
+    # create directories if not exist
     if ! aws s3 ls "s3://$BUCKET_NAME/releases/" > /dev/null 2>&1; then
       aws s3api put-object --bucket "$BUCKET_NAME" --key "releases/"
     fi
-    if ! aws s3 ls "s3://$BUCKET_NAME/releases/$VERSION" > /dev/null 2>&1; then
+    if ! aws s3 ls "s3://$BUCKET_NAME/releases"; then
       aws s3api put-object --bucket "$BUCKET_NAME" --key "releases/$VERSION"
     fi
 
-    aws s3 sync "chromium/src/out/Release/chrome" "s3://$BUCKET_NAME/releases/$VERSION/$GITHUB_SHA" --quiet
+    # push release
+    tar -czf "$TMP/release.tar.gz" -C "chromium/src/out/Release/chrome"
+    aws s3 cp "chromium/src/out/Release/chrome" "s3://$BUCKET_NAME/releases/$VERSION/$GIT_SHA.release.tar.gz" --quiet
     
     save-log
-    echo "Uploading ccache to S3..."
-    save-log
-    aws s3 sync "$CCACHE_DIR/" "s3://$BUCKET_NAME/ccache/" --quiet
+    
+    if [ -d /data ]; then
+      echo "Uploading ccache to S3..."
+      
+      echo "Creating ccache archive..."
+      tar -czf "$TMP/ccache.tar.gz" -C "$CCACHE_DIR"
+      echo "Uploading ccache to S3..."
+      aws s3 cp "$TMP/ccache.tar.gz" "s3://$BUCKET_NAME/ccache.tar.gz" --quiet
+    fi
+    
   fi
 fi
 

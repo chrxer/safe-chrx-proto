@@ -80,7 +80,11 @@ Free space on SSD
 df -h /data
 ```
 
-Size stats for chromium source
+CCache used space
+```bash
+echo "Storage used: $(du -sh /data/ccache)"
+echo "File count: $(find /data/ccache -type f | wc -l)"
+```
 
 ### Retrieve log from S3
 ```bash
