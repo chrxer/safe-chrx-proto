@@ -1,5 +1,7 @@
 chromium/
 chromium_patched/
 depot_tools/
-chromiumrelease
+releases/
+build/
+args.gn
 !patch/chromium

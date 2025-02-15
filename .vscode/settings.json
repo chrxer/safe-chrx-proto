@@ -1,6 +1,7 @@
 {
   "files.associations": {
-    "*/.gclient": "python"
+    "*/.gclient": "python",
+    "*/*.gn": "plaintext"
   },
   "terminal.integrated.env.linux": {
     "PATH": "${workspaceFolder}/depot_tools:${env:PATH}"
