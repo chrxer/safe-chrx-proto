@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-    url := "http://localhost:3333/hello"
-    data := []byte(`{"name": "John", "age": 30}`)
+    url := "http://localhost:3333/encrypt"
+    data := []byte("veryImportantPassword")
 
     req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(data))
     if err != nil {
@@ -26,5 +26,7 @@ func main() {
     }
     defer resp.Body.Close()
 
-    // do something with the response
+    fmt.Printf("%s\n", resp.Status)
+    fmt.Printf("%s\n", resp.Header)
+    fmt.Printf("%s", resp.Body)
 }
