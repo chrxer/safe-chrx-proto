@@ -19,6 +19,11 @@ export CCACHE_SLOPPINESS=time_macros
 cd "$CHROMIUM/src"
 
 
+# pseudo-parsed args
+# supported: 
+#   New lines (become " ")
+#   Empty lines & lines starting with # (are deleted)
+#   regular arguments ('"' is automatically escaped to '\"')
 ARGS=$(cat <<EOF
 # https://salsa.debian.org/chromium-team/chromium/-/blob/master/debian/rules
 clang_use_chrome_plugins=false
