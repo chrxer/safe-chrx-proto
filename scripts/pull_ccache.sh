@@ -1,9 +1,10 @@
 # only use for local testing
 # shouldn't run as sudo
 
+set -e
 BUCKET_NAME=amzn-s3-chrxer-bucket-v1
 
-TMP=/tmp
+TMP=.
 CCACHE_DIR=$HOME/.cache/ccache/
 
 if aws s3 ls "s3://$BUCKET_NAME/ccache.tar.gz"; then
@@ -11,7 +12,8 @@ if aws s3 ls "s3://$BUCKET_NAME/ccache.tar.gz"; then
         aws s3 cp "s3://$BUCKET_NAME/ccache.tar.gz" "$TMP/ccache.tar.gz"
 
         echo "Extracting ccache..."
-        tar -xzf "$TMP/ccache.tar.gz" -C "$CCACHE_DIR"
-        # rm -f "$TMP/ccache.tar.gz"
+        mkdir -p $CCACHE_DIR
+        tar -xzf "ccache.tar.gz" -C "$CCACHE_DIR" --strip-components=2
+        rm ccache.tar.gz
 fi
 

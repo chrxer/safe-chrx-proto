@@ -3,5 +3,8 @@ chromium_patched/
 depot_tools/
 releases/
 build/
+
 args.gn
+ccache.tar.gz
+
 !patch/chromium

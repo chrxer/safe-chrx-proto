@@ -8,5 +8,11 @@
   },
   "files.exclude": {
     "**/.git": false
+  },
+  "C_Cpp.files.exclude": {
+    "**/.vscode": true,
+    "**/.vs": true,
+    "chromium/**":true,
+    "build/*":true
   }
 }
