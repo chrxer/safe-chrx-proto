@@ -10,38 +10,37 @@ import (
 var masterPassword []byte
 
 func getRoot(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("got / request\n")
-	io.WriteString(w, "This is my website!\n")
+	io.WriteString(w, "See https://github.com/chrxer/safe-chrx-proto/tree/main/backend/server\n")
 }
 
 func handleEncrypt(w http.ResponseWriter, r *http.Request) {
-	if(!checkPost(w, r)) {
+	if !testPost(w, r) {
 		return
 	}
-	fmt.Printf("post - encrypt\n")
+	fmt.Printf("Encrypting..\n")
 	reqBody, err := io.ReadAll(r.Body)
-    if err != nil {
-    	fmt.Printf(err.Error())
-    }
-    fmt.Printf("%s", encrypt(reqBody))
+	if err != nil {
+		fmt.Printf("%s", err.Error())
+	}
+	w.Write(decrypt(reqBody))
 }
 
 func handleDecrypt(w http.ResponseWriter, r *http.Request) {
-	if(!checkPost(w, r)) {
+	if !testPost(w, r) {
 		return
 	}
-	fmt.Printf("post - decrypt\n")
+	fmt.Printf("Decrypting..\n")
 	reqBody, err := io.ReadAll(r.Body)
-    if err != nil {
-    	fmt.Printf(err.Error())
-    }
-    fmt.Printf("%s", decrypt(reqBody))
+	if err != nil {
+		fmt.Printf("%s", err.Error())
+	}
+	w.Write(decrypt(reqBody))
 }
 
-func checkPost(w http.ResponseWriter, r *http.Request) bool {
-	if(r.Method != "POST"){
+func testPost(w http.ResponseWriter, r *http.Request) bool {
+	if r.Method != "POST" {
 		w.WriteHeader(http.StatusBadRequest)
-    	w.Write([]byte(""))
+		w.Write([]byte(""))
 		return false
 	}
 	return true
