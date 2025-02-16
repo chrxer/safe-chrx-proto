@@ -4,7 +4,7 @@ WRK=$(realpath $(dirname $(dirname "$0")))
 DEPOT="$WRK/depot_tools"
 CHROMIUM="$WRK/chromium"
 
-rm -rf "$CHROMIUM/src/out/*"
+rm -rf "$CHROMIUM/src/out/Release"
 
 # revert git to latest
 

@@ -60,14 +60,14 @@ rtc_use_pipewire=true
 icu_use_data_file=true
 enable_widevine=true
 v8_enable_backtrace=true
-use_system_zlib=true
-use_system_lcms2=true
-use_system_libjpeg=true
-use_system_libpng=true
-use_system_libtiff=false
-use_system_freetype=true
-use_system_harfbuzz=true
-use_system_libopenjpeg2=true
+#use_system_zlib=true
+#use_system_lcms2=true
+#use_system_libjpeg=true
+#use_system_libpng=true
+#use_system_libtiff=false
+#use_system_freetype=true
+#use_system_harfbuzz=true
+#use_system_libopenjpeg2=true
 proprietary_codecs=true
 ffmpeg_branding="Chrome"
 disable_fieldtrial_testing_config=true
@@ -82,7 +82,7 @@ EOF
 )
 
 # escape args propperly
-ARGS=$(echo "$ARGS" | sed '/^\s*#/d' | sed '/^\s*$/d' | sed 's/"/\\"/g' | tr '\n' ' ')
+ARGS=$(echo "$ARGS" | sed '/^\s*#/d' | sed '/^\s*$/d' | paste -sd " ")
 
 echo "building with" 
 echo $ARGS
@@ -90,7 +90,7 @@ echo "Now"
 
 if [ ! -d "out/Release" ]; then
     echo "gn gen Chromium release.."
-    gn gen out/Release --ARGS="$ARGS"
+    gn gen out/Release --args="$ARGS"
 fi
 
 echo "autoninja .."
