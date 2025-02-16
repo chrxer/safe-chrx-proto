@@ -13,6 +13,7 @@ Filesystem      Size  Used Avail Use% Mounted on
 - [ ] test ccache speedup
   - [x] local
   - [ ] EC2
+    - [ ] fix Ccache no hits 
 - [ ] setup publishing releases using fine-grained tokens
 - [ ] ensure EC2s are automatically terminated after build or n hours
 - [ ] start with modification of [os_crypt](https://source.chromium.org/search?q=(EncryptString%20OR%20DecryptString)%20AND%20file:os_crypt_%20-unittest%20-browsertest&ss=chromium%2Fchromium%2Fsrc)

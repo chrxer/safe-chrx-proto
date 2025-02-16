@@ -25,18 +25,17 @@ Deps installed: ~ 10 min.
 CPU: ~ 99% during compilation
 ~6.5 h -> 2.3 USD
 ```
+
+with ccache:
 ```
-c5ad.4xlarge: 0.688 USD/h
-Deps installed: ~ 7 min.
-CPU: ~ 99% during compilation
-~4h -> 2.8 USD
+Deps installed: ~ 11 min.
+~? h -> ? USD
 ```
 
 File sizes (131.0.6778.139)
 ```
 Sources: 24G (downloaded from google server)
 Ccache:  3.4G (tar.gz archive => S3)
-Release: 2.1G (tar.gz archive => S3)
 ```
 
 ## Developers
