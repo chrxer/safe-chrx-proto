@@ -1,7 +1,7 @@
 ## Priority
 - [x] setup EC2 instance startup
 - [x] setup S3 Ccache & log upload
-- [x] first ok compillation start//process of chromium
+- [x] first ok compilation start//process of chromium
 - [x] specify specific chromium version [chromiumdash.appspot.com/releases](https://chromiumdash.appspot.com/releases?platform=Linux)
 ```bash
  df -h /home/ubuntu/.cache/ccache/
@@ -9,7 +9,7 @@ Filesystem      Size  Used Avail Use% Mounted on
 /dev/root       6.8G  5.8G  987M  86% /
 ```
 - [x] fix ccache location
-- [x] first succesfull compillation
+- [x] first succesfull compilation
 - [ ] test ccache speedup
   - [x] local
   - [ ] EC2
