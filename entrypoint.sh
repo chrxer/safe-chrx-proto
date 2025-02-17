@@ -63,7 +63,7 @@ if [ -n "$EC2ID" ]; then
 
     if aws s3 ls "s3://$BUCKET_NAME/ccache.tar.gz"; then
         echo "Fetching ccache from S3..."
-        sudo -u $USER env "PATH=$PATH" aws s3 cp "s3://$BUCKET_NAME/ccache.tar.gz" "$TMP/ccache.tar.gz"
+        sudo -u $USER env "PATH=$PATH" aws s3 cp "s3://$BUCKET_NAME/ccache.tar.gz" "$TMP/ccache.tar.gz" --quiet
 
         echo "Extracting ccache..."
         sudo -u $USER env "PATH=$PATH" tar -xzf "$TMP/ccache.tar.gz" -C "$CCACHE_DIR" --strip-components=2
