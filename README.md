@@ -28,8 +28,10 @@ CPU: ~ 99% during compilation
 
 with ccache:
 ```
+Hits: 99.97%
+Errors: 0.03% (Could not read or parse input file:)
 Deps installed: ~ 11 min.
-~? h -> ? USD
+50 min -> 0.29 USD
 ```
 
 File sizes (131.0.6778.139)
