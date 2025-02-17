@@ -14,6 +14,6 @@ if aws s3 ls "s3://$BUCKET_NAME/ccache.tar.gz"; then
         echo "Extracting ccache..."
         mkdir -p $CCACHE_DIR
         tar -xzf "ccache.tar.gz" -C "$CCACHE_DIR" --strip-components=2
-        rm ccache.tar.gz
+        # rm ccache.tar.gz
 fi
 
