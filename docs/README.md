@@ -69,21 +69,19 @@ Enter build directory
 cd /data
 ```
 
-You may uses
+You may use
 ```bash
 tail -f -n +1 /tmp/build.log
 ```
 for retrieving the output of [build.sh](../build.sh)
-
-Free space on SSD
+CCache stats
 ```bash
-df -h /data
+ccache -sv
 ```
 
-CCache used space
+Show hardware usage
 ```bash
-echo "Storage used: $(du -sh /data/ccache)"
-echo "File count: $(find /data/ccache -type f | wc -l)"
+htop
 ```
 
 ### Retrieve log from S3

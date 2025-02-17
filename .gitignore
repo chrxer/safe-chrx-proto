@@ -5,6 +5,6 @@ releases/
 build/
 
 args.gn
-ccache.tar.gz
+ccache.tar.gz*
 
 !patch/chromium

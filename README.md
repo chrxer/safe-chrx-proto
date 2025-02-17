@@ -21,7 +21,7 @@ See [build](build/)
 Build time without existing Ccache on:
 ```
 c5ad.2xlarge: 0.344 USD/h
-Deps installed: ~ 10 min.
+Compillation start: ~ 9 min. -> 0.05 USD
 CPU: ~ 99% during compilation
 ~6.5 h -> 2.3 USD
 ```
