@@ -77,7 +77,7 @@ google_api_key="AIzaSyCkfPOPZXDKNn8hhgu3JrA62wIgC93d44k"
 google_default_client_id="811574891467.apps.googleusercontent.com"
 google_default_client_secret="kdloedMFGdGla2P1zacGjAQh"
 
-cc_wrapper="env CCACHE_SLOPPINESS=time_macros CCACHE_NOHASHDIR=1 ccache"
+cc_wrapper="env CCACHE_SLOPPINESS=time_macros CCACHE_NOHASHDIR=1 CCACHE_LOGFILE=/tmp/ccache_log.log ccache"
 EOF
 )
 
