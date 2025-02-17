@@ -119,5 +119,5 @@ fi
 # Upload ccache back to S3 after building
 if [ -n "$EC2ID" ]; then
   save-log
-  echo "sudo shutdown -h now"
+  sudo shutdown -h now
 fi
