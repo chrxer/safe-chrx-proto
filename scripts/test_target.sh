@@ -12,6 +12,11 @@ export PATH="$DEPOT:$PATH"
 
 cd $CHROMIUM/src
 
+# pseudo-parsed args
+# supported: 
+#   New lines (become " ")
+#   Empty lines & lines starting with # (are deleted)
+#   regular arguments ('"' is automatically escaped to '\"')
 ARGS=$(cat <<EOF
 # https://salsa.debian.org/chromium-team/chromium/-/blob/master/debian/rules
 clang_use_chrome_plugins=false
@@ -19,7 +24,10 @@ clang_use_chrome_plugins=false
 # disabled features
 #is_debug=false
 use_libjpeg_turbo=true
-use_custom_libcxx=false
+
+# ./../third_party/dawn/src/dawn/common/StringViewUtils.cpp:51:21: error: no member named 'strlen' in namespace 'std'
+# use_custom_libcxx=false
+
 use_unofficial_version_number=false
 safe_browsing_use_unrar=false
 enable_vr=false
@@ -58,7 +66,7 @@ v8_enable_backtrace=true
 #use_system_libopenjpeg2=true
 proprietary_codecs=true
 ffmpeg_branding="Chrome"
-#disable_fieldtrial_testing_config=true
+disable_fieldtrial_testing_config=true
 
 # https://salsa.debian.org/chromium-team/chromium/-/blob/master/debian/etc/apikeys?ref_type=heads
 google_api_key="AIzaSyCkfPOPZXDKNn8hhgu3JrA62wIgC93d44k"
