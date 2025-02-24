@@ -69,18 +69,20 @@ Enter build directory
 cd /data
 ```
 
-You may uses
+You may use
 ```bash
 tail -f -n +1 /tmp/build.log
 ```
 for retrieving the output of [build.sh](../build.sh)
-
-Free space on SSD
+CCache stats
 ```bash
-df -h /data
+ccache -sv
 ```
 
-Size stats for chromium source
+Show hardware usage
+```bash
+htop
+```
 
 ### Retrieve log from S3
 ```bash

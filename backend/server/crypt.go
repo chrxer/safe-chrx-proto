@@ -4,7 +4,6 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"fmt"
 	"io"
 )
 
@@ -13,7 +12,7 @@ import (
 func encrypt(b []byte) []byte {
 	mP := getMasterPassword()
 	//Create a new Cipher Block from the key
-	
+
 	block, err := aes.NewCipher(mP)
 	if err != nil {
 		panic(err.Error())
@@ -34,7 +33,6 @@ func encrypt(b []byte) []byte {
 	//Encrypt the data using aesGCM.Seal
 	//Since we don't want to save the nonce somewhere else in this case, we add it as a prefix to the encrypted data. The first nonce argument in Seal is the prefix.
 	ciphertext := aesGCM.Seal(nonce, nonce, b, nil)
-	fmt.Sprintf("%x", ciphertext)
 	return ciphertext
 }
 
@@ -63,15 +61,16 @@ func decrypt(b []byte) []byte {
 		panic(err.Error())
 	}
 
-	fmt.Sprintf("%s", plaintext)
 	return plaintext
 }
 
+var mockKey = make([]byte, 32)
+
 func getMasterPassword() []byte {
-	if(len(masterPassword) == 0) {
+	if len(masterPassword) == 0 {
 		// get Masterpassword
 		// return []byte("ThisIsSomeReallyLongKey")
-		return make([]byte, 32)
+		return mockKey
 	} else {
 		return masterPassword
 	}

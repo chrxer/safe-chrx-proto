@@ -20,18 +20,24 @@ See [build](build/)
 
 Build time without existing Ccache on:
 ```
-c5ad.xlarge: 
-Deps installed: 12~14 min.
-Building (estimated): 3.5 ~ 4.5 h ~ 0.7 USD
-CPU: ~ 99% during compillation
-~7'900 targets/h -> 6.5 h. -> 1.1 USD
+c5ad.2xlarge: 0.344 USD/h
+Compillation start: ~ 9 min. -> 0.05 USD
+CPU: ~ 99% during compilation
+~7 h -> 2.4 USD
 ```
+
+with ccache:
 ```
-c5ad.2xlarge: 
-Deps installed: 12~14 min.
-Building (estimated): 3.5 ~ 4.5 h ~ 0.7 USD
-CPU: ~ 99% during compillation
-~7'900 targets/h -> 6.5 h. -> 1.1 USD
+Hits: 99.97%
+Errors: 0.03% (Could not read or parse input file:)
+Deps installed: ~ 11 min.
+50 min -> 0.29 USD
+```
+
+File sizes (131.0.6778.139)
+```
+Sources: 24G (downloaded from google server)
+Ccache:  3.4G (tar.gz archive => S3)
 ```
 
 ## Developers

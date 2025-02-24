@@ -1,11 +1,18 @@
 {
   "files.associations": {
-    "*/.gclient": "python"
+    "*/.gclient": "python",
+    "*/*.gn": "plaintext"
   },
   "terminal.integrated.env.linux": {
-    "PATH": "${workspaceFolder}/depot_tools:${env:PATH}"
+    "PATH": "${workspaceFolder}/depot_tools:${env:PATH}:/usr/local/go/bin"
   },
   "files.exclude": {
     "**/.git": false
+  },
+  "C_Cpp.files.exclude": {
+    "**/.vscode": true,
+    "**/.vs": true,
+    "chromium/**":true,
+    "build/*":true
   }
 }

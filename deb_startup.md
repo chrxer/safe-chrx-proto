@@ -1,0 +1,1 @@
+Chromium should be started by default with [master_preferences](https://salsa.debian.org/chromium-team/chromium/-/blob/master/debian/etc/master_preferences?ref_type=heads) and [extensions](https://salsa.debian.org/chromium-team/chromium/-/blob/master/debian/etc/extensions?ref_type=heads)
