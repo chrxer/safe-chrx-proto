@@ -30,12 +30,14 @@ Filesystem      Size  Used Avail Use% Mounted on
 
   </details>
 
-- [ ] setup publishing releases using fine-grained tokens
+
 - [ ] ensure EC2s are automatically terminated after build or n hours
+- [ ] embedd default prefst around [initial_preferences.c](https://source.chromium.org/chromium/chromium/src/+/main:chrome/installer/util/initial_preferences.cc;drc=9be37efad6ba9af197f8cc22921f63a229a3a840;l=188) automatically
 - [ ] start with modification of [os_crypt](https://source.chromium.org/search?q=(EncryptString%20OR%20DecryptString)%20AND%20file:os_crypt_%20-unittest%20-browsertest&ss=chromium%2Fchromium%2Fsrc)
 
 
 ## Optimization 
+- [ ] setup publishing releases using fine-grained tokens
 - [ ] move to [hetzner.com/cloud](https://www.hetzner.com/cloud/) using [setup-hcloud](https://github.com/hetznercloud/setup-hcloud) github action ([cli docs](https://github.com/hetznercloud/cli))
 - [ ] Use [OICD](https://github.com/aws-actions/configure-aws-credentials?tab=readme-ov-file#oidc) for authenticating to ~~AWS~~ Hetzner
 - [ ] Use S3 for caching APT packages
