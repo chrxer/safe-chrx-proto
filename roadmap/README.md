@@ -223,4 +223,12 @@ Feb 25 02:17:23.238750 debian kernel: [  82569]     0 82569   220102      687   
  
 </details>
 
-Potential solution: Create swap partition using `gparted` [instructions](https://www.wikihow.com/Attach-a-Swap-Partition-to-Linux)
+Potential solution: Create partition using `gparted` & then run
+```bash
+PART=/dev/sda3
+sudo mkswap $PART
+FS_UUID=$(sudo blkid -o value -s UUID $PART)
+sudo swapon -U $FS_UUID
+echo "\nUUID=$FS_UUID    none    swap    sw      0   0" | sudo tee -a /etc/fstab
+free -h
+```
