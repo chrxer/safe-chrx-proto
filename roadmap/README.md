@@ -226,3 +226,4 @@ Feb 25 02:17:23.238750 debian kernel: [  82569]     0 82569   220102      687   
 ```bash
 sudo fallocate -l 10G -x /swapfile
 ```
+[source](https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-debian-11)
