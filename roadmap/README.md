@@ -223,5 +223,17 @@ Feb 25 02:17:23.238750 debian kernel: [  82569]     0 82569   220102      687   
  
 </details>
 
-Potential solution: Create swapfile
+Potential solution: Create swapfile (Debian live)
 [instructions](https://wiki.debian.org/Swap)
+```bash
+sudo mkdir -p /mnt/persistence
+sudo mount /dev/sda2 /mnt/persistence
+
+sudo fallocate -l 12G -x /mnt/persistence/swapfile
+sudo chmod 600 /mnt/persistence/swapfile
+sudo mkswap /mnt/persistence/swapfile
+sudo swapon /mnt/persistence/swapfile
+
+echo "/mnt/persistence/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
+sudo swapon --show
+```
