@@ -223,4 +223,4 @@ Feb 25 02:17:23.238750 debian kernel: [  82569]     0 82569   220102      687   
  
 </details>
 
-Potential solution: Create swap partition using `gparted`
+Potential solution: Create swap partition using `gparted` [instructions](https://www.wikihow.com/Attach-a-Swap-Partition-to-Linux)
