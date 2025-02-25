@@ -74,15 +74,21 @@ google_default_client_id="811574891467.apps.googleusercontent.com"
 google_default_client_secret="kdloedMFGdGla2P1zacGjAQh"
 
 cc_wrapper="env CCACHE_SLOPPINESS=time_macros CCACHE_NOHASHDIR=1 CCACHE_LOGFILE=/tmp/ccache_log.log ccache"
+is_component_build=true
 EOF
 )
 
 ARGS=$(echo "$ARGS" | sed '/^\s*#/d' | sed '/^\s*$/d' | paste -sd " ")
 
+# components/BUILD.gn
+# components/os_crypt/sync/os_crypt_unittest.cc
+
 gn gen out/Test --root-target=//components/os_crypt/sync --args="$ARGS"
 # gn ls out/Test | grep os_crypt
+# gn refs out/Tests --testonly=true --type=executable --all components/os_crypt/sync/os_crypt_unittest.cc
 
-autoninja -C out/Test components/os_crypt/sync:unit_tests
+# autoninja -C out/Test components/os_crypt/sync:unit_tests
+tools/autotest.py -C out/Test os_crypt_unittest.cc
 #out/Test/installer_util_unittests
 
 cd $WRK
