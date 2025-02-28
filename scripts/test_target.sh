@@ -87,8 +87,17 @@ gn gen out/Test --root-target=//components/os_crypt/sync --args="$ARGS"
 # gn ls out/Test | grep os_crypt
 # gn refs out/Tests --testonly=true --type=executable --all components/os_crypt/sync/os_crypt_unittest.cc
 
+echo "Testing now: `date "+%Y-%m-%d %H:%M:%S"`"
+
 # autoninja -C out/Test components/os_crypt/sync:unit_tests
+
+# /usr/lib/xorg/Xorg.wrap: Only console users are allowed to run the X server
+# Solution: set
+# echo "allowed_users=anybody" | sudo tee -a /etc/X11/Xwrapper.config
+
 tools/autotest.py -C out/Test os_crypt_unittest.cc
 #out/Test/installer_util_unittests
+
+echo "Chromium test complete: `date "+%Y-%m-%d %H:%M:%S"`"
 
 cd $WRK

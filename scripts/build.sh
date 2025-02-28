@@ -89,7 +89,7 @@ ARGS=$(echo "$ARGS" | sed '/^\s*#/d' | sed '/^\s*$/d' | paste -sd " ")
 
 echo "building with" 
 echo $ARGS
-echo "Now"
+echo "Now `date "+%Y-%m-%d %H:%M:%S"`"
 
 if [ ! -d "out/Release" ]; then
     echo "gn gen Chromium release.."
@@ -98,7 +98,7 @@ fi
 
 echo "autoninja .."
 autoninja -C out/Release chrome
-echo "Chromium build complete"
+echo "Chromium build complete: `date "+%Y-%m-%d %H:%M:%S"`"
 
 cd "$WRK"
 set +e
