@@ -37,6 +37,7 @@ Filesystem      Size  Used Avail Use% Mounted on
 
 
 ## Optimization 
+- [ ] move from bash to python
 - [ ] setup publishing releases using fine-grained tokens
 - [ ] move to [hetzner.com/cloud](https://www.hetzner.com/cloud/) using [setup-hcloud](https://github.com/hetznercloud/setup-hcloud) github action ([cli docs](https://github.com/hetznercloud/cli))
 - [ ] Use [OICD](https://github.com/aws-actions/configure-aws-credentials?tab=readme-ov-file#oidc) for authenticating to ~~AWS~~ Hetzner
