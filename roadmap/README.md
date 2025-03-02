@@ -33,7 +33,7 @@ Filesystem      Size  Used Avail Use% Mounted on
 
 - [ ] ensure EC2s are automatically terminated after build or n hours
 
-- [ ] start with modification of [os_crypt](https://source.chromium.org/search?q=(EncryptString%20OR%20DecryptString)%20AND%20file:os_crypt_%20-unittest%20-browsertest&ss=chromium%2Fchromium%2Fsrc)
+- [ ] start with patching of [os_crypt](https://source.chromium.org/search?q=(EncryptString%20OR%20DecryptString)%20AND%20file:os_crypt_%20-unittest%20-browsertest&ss=chromium%2Fchromium%2Fsrc) using clang [python bindings](https://source.chromium.org/chromium/chromium/src/+/main:third_party/angle/third_party/llvm/src/clang/bindings/python/)
 
 
 ## Optimization 
