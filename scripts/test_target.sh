@@ -10,14 +10,7 @@ VERSION=$(cat "$WRK/chromium.version")
 
 export PATH="$DEPOT:$PATH"
 
-echo "Configuring ccache"
-ccache --max-size=30G
-export CCACHE_CPP2=yes
-export CCACHE_SLOPPINESS=time_macros
-
-# Build Chromium
-cd "$CHROMIUM/src"
-
+cd $CHROMIUM/src
 
 # pseudo-parsed args
 # supported: 
@@ -29,7 +22,7 @@ ARGS=$(cat <<EOF
 clang_use_chrome_plugins=false
 
 # disabled features
-is_debug=false
+#is_debug=false
 use_libjpeg_turbo=true
 
 # ./../third_party/dawn/src/dawn/common/StringViewUtils.cpp:51:21: error: no member named 'strlen' in namespace 'std'
@@ -39,13 +32,13 @@ use_unofficial_version_number=false
 safe_browsing_use_unrar=false
 enable_vr=false
 enable_nacl=false
-build_dawn_tests=false
+#build_dawn_tests=false
 enable_reading_list=false
-enable_iterator_debugging=false
+#enable_iterator_debugging=false
 enable_hangout_services_extension=false
 angle_has_histograms=false
-angle_build_tests=false
-build_angle_perftests=false
+#angle_build_tests=false
+#build_angle_perftests=false
 treat_warnings_as_errors=false
 use_qt=false
 is_cfi=false
@@ -53,10 +46,10 @@ chrome_pgo_phase=0
 
 # enabled features
 use_gio=true
-is_official_build=true
-symbol_level=0
-blink_symbol_level=0
-v8_symbol_level=0
+#is_official_build=true
+#symbol_level=0
+#blink_symbol_level=0
+#v8_symbol_level=0
 use_pulseaudio=true
 link_pulseaudio=true
 rtc_use_pipewire=true
@@ -81,24 +74,30 @@ google_default_client_id="811574891467.apps.googleusercontent.com"
 google_default_client_secret="kdloedMFGdGla2P1zacGjAQh"
 
 cc_wrapper="env CCACHE_SLOPPINESS=time_macros CCACHE_NOHASHDIR=1 CCACHE_LOGFILE=/tmp/ccache_log.log ccache"
+is_component_build=true
 EOF
 )
 
-# escape args propperly
 ARGS=$(echo "$ARGS" | sed '/^\s*#/d' | sed '/^\s*$/d' | paste -sd " ")
 
-echo "building with" 
-echo $ARGS
-echo "Now `date "+%Y-%m-%d %H:%M:%S"`"
+# components/BUILD.gn
+# components/os_crypt/sync/os_crypt_unittest.cc
 
-if [ ! -d "out/Release" ]; then
-    echo "gn gen Chromium release.."
-    gn gen out/Release --args="$ARGS"
-fi
+gn gen out/Test --root-target=//components/os_crypt/sync --args="$ARGS"
+# gn ls out/Test | grep os_crypt
+# gn refs out/Tests --testonly=true --type=executable --all components/os_crypt/sync/os_crypt_unittest.cc
 
-echo "autoninja .."
-autoninja -C out/Release chrome
-echo "Chromium build complete: `date "+%Y-%m-%d %H:%M:%S"`"
+echo "Testing now: `date "+%Y-%m-%d %H:%M:%S"`"
 
-cd "$WRK"
-set +e
+# autoninja -C out/Test components/os_crypt/sync:unit_tests
+
+# /usr/lib/xorg/Xorg.wrap: Only console users are allowed to run the X server
+# Solution: set
+# echo "allowed_users=anybody" | sudo tee -a /etc/X11/Xwrapper.config
+
+tools/autotest.py -C out/Test os_crypt_unittest.cc
+#out/Test/installer_util_unittests
+
+echo "Chromium test complete: `date "+%Y-%m-%d %H:%M:%S"`"
+
+cd $WRK
