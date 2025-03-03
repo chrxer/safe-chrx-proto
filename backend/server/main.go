@@ -6,8 +6,7 @@ import (
 	"net/http"
 )
 
-// var masterPassword []byte
-var masterPassword []byte
+var masterKey []byte
 
 func getRoot(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "See https://github.com/chrxer/safe-chrx-proto/tree/main/backend/server\n")
@@ -22,7 +21,7 @@ func handleEncrypt(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Printf("%s", err.Error())
 	}
-	w.Write(decrypt(reqBody))
+	w.Write(encrypt(reqBody))
 }
 
 func handleDecrypt(w http.ResponseWriter, r *http.Request) {
