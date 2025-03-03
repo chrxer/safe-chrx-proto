@@ -2,7 +2,7 @@
 
 from utils.fs import rmtree
 from utils import OUT, SRC
-from utils import git
+from utils import git_
 import sys
 
 def clean(_target):
@@ -15,4 +15,4 @@ if __name__ == "__main__":
     
     _target = sys.argv[1]
     clean(_target)
-    git.reset(SRC)
+    git_.reset(SRC)

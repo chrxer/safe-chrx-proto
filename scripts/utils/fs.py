@@ -1,6 +1,7 @@
-from .git import IS_LINUX
+#!/usr/bin/python3
+
 from .wrap import exc
-from .initenv import SRC, WRK
+from .initenv import SRC, WRK, IS_LINUX
 from pathlib import Path
 
 from typing import Union

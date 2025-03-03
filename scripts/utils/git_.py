@@ -3,7 +3,7 @@
 from os import PathLike
 from .initenv import IS_LINUX, SRC, VERSION
 from .wrap import exc
-from .fetch import fetch
+from .fetch_ import fetch
 import json
 
 
