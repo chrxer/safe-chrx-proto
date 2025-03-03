@@ -10,4 +10,4 @@ build:
 	scripts/build.sh && scripts/pack.sh
 
 clean:
-	scripts/clean.sh
+	scripts/clean.py Release
