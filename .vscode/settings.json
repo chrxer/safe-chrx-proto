@@ -14,5 +14,8 @@
     "**/.vs": true,
     "chromium/**":true,
     "build/*":true
-  }
+  },
+  "python.analysis.extraPaths":[
+    "${workspaceFolder}/depot_tools"
+  ]
 }

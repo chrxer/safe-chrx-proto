@@ -3,6 +3,8 @@ from .wrap import exc
 from .initenv import SRC, WRK
 from pathlib import Path
 
+from typing import Union
+
 import shlex
 from os import PathLike
 import re
@@ -24,7 +26,13 @@ def rmtree(path:PathLike):
         import shutil
         shutil.rmtree(path, ignore_errors=True)
 
-def fmt(num, base=1000, suffix=""):
+def read(path:PathLike,_str:bool=True) -> Union[str, bytes]:
+    with open(path, "rb") as f:
+        if _str:
+            return f.read().decode("utf-8")
+        return f.read()
+
+def fmt(num:int, base:int=1000, suffix:str=""):
     """Convert a number into a human-readable format using SI (decimal) or IEC (binary) units."""
     units = ("", "K", "M", "B", "T", "P", "E", "Z", "Y") if base == 1000 else ("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi")
     for unit in units:

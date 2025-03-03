@@ -4,10 +4,10 @@ deps:
 	scripts/deps.sh
 
 patch:
-	scripts/patch.sh
+	scripts/patch.py
 
 build:
-	scripts/build.sh && scripts/pack.sh
+	scripts/build.sh && scripts/pack.py
 
 clean:
 	scripts/clean.py Release
