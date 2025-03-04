@@ -7,7 +7,7 @@ patch:
 	scripts/patch.py
 
 build:
-	scripts/build.sh && scripts/pack.py
+	scripts/build.py && scripts/pack.py
 
 os_crypt:
 	scripts/build_os_crypt.py
