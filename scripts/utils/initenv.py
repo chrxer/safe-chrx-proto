@@ -12,8 +12,9 @@ WRK=pathlib.Path(__file__).parent.parent.parent.resolve()
 SRC=WRK.joinpath("chromium/src")
 
 DEPOT_TOOLS=WRK.joinpath("depot_tools")
+VENVBIN=WRK.joinpath("scripts/.venv/bin")
 sys.path.insert(0, DEPOT_TOOLS)
-os.environ["PATH"] += os.pathsep + str(DEPOT_TOOLS)
+os.environ["PATH"] = str(DEPOT_TOOLS) + os.pathsep + str(VENVBIN) + os.pathsep + os.environ["PATH"]
 
 OUT=SRC.joinpath("out")
 RELEASE=OUT.joinpath("Release")

@@ -4,7 +4,7 @@
     "*/*.gn": "plaintext"
   },
   "terminal.integrated.env.linux": {
-    "PATH": "${workspaceFolder}/depot_tools:${env:PATH}:/usr/local/go/bin"
+    "PATH": "${workspaceFolder}/scripts/.venv/bin:${workspaceFolder}/depot_tools:${env:PATH}:/usr/local/go/bin"
   },
   "files.exclude": {
     "**/.git": false
@@ -19,6 +19,5 @@
     "${workspaceFolder}/depot_tools",
     "${workspaceFolder}/scripts"
   ],
-  "python.defaultInterpreterPath":"${workspaceFolder}/scripts/.venv/bin/python",
-  "python.pipenvPath": "${workspaceFolder}/scripts/.venv"
+  "python.defaultInterpreterPath":"${workspaceFolder}/scripts/.venv/bin/python"
 }
