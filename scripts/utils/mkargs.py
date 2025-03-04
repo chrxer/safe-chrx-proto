@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!scripts/.venv/bin/python3
 
 from typing import Dict, List
 

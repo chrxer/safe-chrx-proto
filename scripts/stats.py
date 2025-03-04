@@ -1,4 +1,5 @@
-#!/usr/bin/python3
+#!scripts/.venv/bin/python3
+
 import datetime
 
 from utils.git_ import fcount

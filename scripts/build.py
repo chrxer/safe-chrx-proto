@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!scripts/.venv/bin/python3
 
 from utils import ccache_, DEPOT_TOOLS, OUT, SRC, mkargs
 from utils.wrap import pyexc

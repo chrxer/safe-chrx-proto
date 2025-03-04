@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!scripts/.venv/bin/python3
 
 from typing import Iterable, Union, Dict
 from os import PathLike
@@ -25,7 +25,8 @@ def exc(*cmd:Iterable[str],dbg:bool=True, _bytes:bool=False,timeout:float=None, 
     stamp = datetime.datetime.now().strftime("%m-%d %H:%M:%S")
 
     hcmd = list(cmd).copy()
-    hcmd[_pidx] = fmtpath(hcmd[_pidx])
+    for i in range(0, _pidx):
+        hcmd[i] = fmtpath(hcmd[i])
 
     if dbg:
         print(f"\033[94m[EXC {stamp}]\033[0m {shlex.join(hcmd)}")

@@ -16,7 +16,10 @@ Our password manager requires a **master password** when autofilling the first t
 See [roadmap](roadmap/)
 
 ## Building
-See [build](build/)
+
+<details>
+
+<summary>on EC2</summary>
 
 Build time without existing Ccache on:
 ```
@@ -39,6 +42,8 @@ File sizes (131.0.6778.139)
 Sources: 24G (downloaded from google server)
 Ccache:  3.4G (tar.gz archive => S3)
 ```
+
+</details>
 
 ## Developers
 Integrated as a school-project \

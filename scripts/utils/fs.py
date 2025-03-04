@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!scripts/.venv/bin/python3
 
 from .wrap import exc
 from .initenv import SRC, WRK, IS_LINUX

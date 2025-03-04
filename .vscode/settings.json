@@ -18,5 +18,7 @@
   "python.analysis.extraPaths":[
     "${workspaceFolder}/depot_tools",
     "${workspaceFolder}/scripts"
-  ]
+  ],
+  "python.defaultInterpreterPath":"${workspaceFolder}/scripts/.venv/bin/python",
+  "python.pipenvPath": "${workspaceFolder}/scripts/.venv"
 }

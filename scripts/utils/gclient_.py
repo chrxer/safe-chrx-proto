@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!scripts/.venv/bin/python3
 
 from utils import SRC, DEPOT_TOOLS, VERSION, git_
 from .wrap import pyexc

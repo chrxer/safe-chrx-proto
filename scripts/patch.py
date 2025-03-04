@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!scripts/.venv/bin/python3
 
 from utils import SRC, git_, gclient_, PATCH, WRK
 import shutil

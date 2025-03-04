@@ -2,7 +2,7 @@
 
 # requires sudo!
 
-#!/bin/bash
+set -e
 
 # Loop through arguments
 for arg in "$@"; do
@@ -40,6 +40,9 @@ asu() {
     sudo env "PATH=$PATH" "$@"
 }
 
+nsu python3 -m venv scripts/.venv
+nsu scripts/.venv/bin/python -m pip install -r scripts/requirements.txt
+
 VERSION=$(cat "$WRK/chromium.version")
 COMMIT=$(sudo -u "$USER" env "PATH=$PATH" "$WRK/scripts/utils/git_.py")
 echo $COMMIT
@@ -48,7 +51,7 @@ gsync() {
     nsu gclient sync --force --nohooks --no-history --shallow --jobs 8 --revision src@$COMMIT
 }
 
-set -e
+
 
 if [ ! -d "$WRK/depot_tools" ]; then
     nsu git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
@@ -70,7 +73,6 @@ fi
 # subprocess.CalledProcessError: Command '['sudo', 'apt-get', 'update']' returned non-zero exit status 100.
 set +e
 nsu sed -i '/subprocess\.check_call\s*(\s*\["sudo",\s*"apt-get",\s*"update"\s*\]\s*)/d' "$CHROMIUM/src/build/install-build-deps.py"
-set -e
 asu "$CHROMIUM/src/build/install-build-deps.sh"
 cd $WRK
 

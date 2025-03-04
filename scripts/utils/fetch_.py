@@ -1,7 +1,8 @@
-#!/usr/bin/python3
+#!scripts/.venv/bin/python3
+import requests
 
-
-from urllib.request import urlopen
 def fetch(url:str) -> bytes:
-    resp = urlopen(url)
-    return resp.read()
+    resp = requests.get(url, allow_redirects=True)
+    if resp.status_code != 200:
+        raise ValueError(f"Expected status 200, but got {resp.status_code}")
+    return resp.content
