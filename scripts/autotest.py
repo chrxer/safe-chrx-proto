@@ -11,7 +11,7 @@ def test(target:str):
     OUTR=str(outdir.relative_to(SRC))
 
     gn(outdir=OUTR, debug=True)
-    ccache_.sv()
+    ccache_.sshow()
     ccache_.z()
     pyexc(str(SRC.joinpath("tools/autotest.py")), "-C" ,OUTR, "os_crypt_unittest.cc", cwd=SRC)
 

@@ -2,6 +2,17 @@
 
 # requires sudo!
 
+#!/bin/bash
+
+# Loop through arguments
+for arg in "$@"; do
+    if [[ "$arg" == "--force" || "$arg" == "-f" ]]; then
+        echo "--force provided"
+        FORCE=1
+    fi
+done
+
+
 WRK=$(realpath $(dirname $(dirname "$0")))
 CHROMIUM="$WRK/chromium"
 
@@ -30,7 +41,8 @@ asu() {
 }
 
 VERSION=$(cat "$WRK/chromium.version")
-COMMIT=$(nsu "$WRK/scripts/utils/git_.py")
+COMMIT=$(sudo -u "$USER" env "PATH=$PATH" "$WRK/scripts/utils/git_.py")
+echo $COMMIT
 
 gsync() {
     nsu gclient sync --force --nohooks --no-history --shallow --jobs 8 --revision src@$COMMIT
@@ -43,12 +55,12 @@ if [ ! -d "$WRK/depot_tools" ]; then
 fi
 
 
-if [ ! -d "$CHROMIUM/src" ]; then
+if [[ -d "$CHROMIUM/src" || $FORCE ]]; then
     nsu mkdir -p "$CHROMIUM"
     cd "$CHROMIUM"
     nsu git config protocol.version 2
     nsu cp "$WRK/patch/chromium/.gclient" "$CHROMIUM"
-    nsu sed -i "s|\$revision|$COMMIT|g" "$CHROMIUM/.gclient"
+    nsu sed -i 's|\$revision|$COMMIT|g' "$CHROMIUM/.gclient"
     gsync
     cd "$CHROMIUM/src"
     gsync

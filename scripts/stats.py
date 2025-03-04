@@ -6,6 +6,8 @@ from utils.fs import fsize, fmt
 from utils import SRC, WRK, ccache_
 
 def show_stats():
+    ccache_.show()
+    
     size=0
     if SRC.exists():
         count = fcount(SRC)
@@ -18,7 +20,7 @@ def show_stats():
     print(f"Size: {fmt(size, 1024, 'B')}")
     print(f"Files: {fmt(count).lower()}")
     print(f"Avg size: {fmt(avg_size, 1024, 'B')}")
-    ccache_.sv()
+    
 
 if __name__ == "__main__":
     show_stats()

@@ -18,13 +18,12 @@ def gn(outdir:str,target:str="chrome",debug:bool=False):
 
     ccache_.set_max_g(30)
     poutdir = SRC.joinpath(outdir)
-    if (not poutdir.is_dir()) or len(os.listdir(poutdir))==0:
-        args = mkargs.make(debug=debug)
-        pargs= ' '.join(args)
-        gnargs = [str(DEPOT_TOOLS.joinpath("gn.py")), "gen", outdir, f"--args={pargs}"]
-        if root_target is not None:
-            gnargs.append(f"--root-target={root_target}")
-        pyexc(*gnargs, cwd=SRC)
+    args = mkargs.make(debug=debug)
+    pargs= ' '.join(args)
+    gnargs = [str(DEPOT_TOOLS.joinpath("gn.py")), "gen", outdir, f"--args={pargs}"]
+    if root_target is not None:
+        gnargs.append(f"--root-target={root_target}")
+    pyexc(*gnargs, cwd=SRC)
 
 
 def build(target:str="chrome",debug:bool=False):
@@ -37,7 +36,7 @@ def build(target:str="chrome",debug:bool=False):
     
     gn(outdir=OUTR, target=target, debug=debug)
     
-    ccache_.sv()
+    ccache_.show()
     ccache_.z()
     pyexc(str(DEPOT_TOOLS.joinpath("autoninja.py")), "-C", OUTR, target, cwd=SRC)
 
