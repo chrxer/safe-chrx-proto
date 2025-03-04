@@ -16,6 +16,7 @@
     "build/*":true
   },
   "python.analysis.extraPaths":[
-    "${workspaceFolder}/depot_tools"
+    "${workspaceFolder}/depot_tools",
+    "${workspaceFolder}/scripts"
   ]
 }

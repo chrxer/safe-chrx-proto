@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from typing import Dict
+from typing import Dict, List
 
 # https://salsa.debian.org/chromium-team/chromium/-/blob/master/debian/etc/apikeys
 API_KEYS = {
@@ -10,7 +10,7 @@ API_KEYS = {
 }
 
 
-def make(debug=False, gapi_keys:Dict[str]=API_KEYS):
+def make(debug=False, gapi_keys:Dict[str, str]=API_KEYS) -> List[str]:
 
     if debug:
         dstr = "true"
@@ -26,7 +26,7 @@ def make(debug=False, gapi_keys:Dict[str]=API_KEYS):
         "clang_use_chrome_plugins=false",
 
         # disabled features
-        "use_libjpeg_turbo=true"
+        "use_libjpeg_turbo=true",
         "use_unofficial_version_number=false",
         "safe_browsing_use_unrar=false",
         "enable_vr=false",
@@ -67,4 +67,6 @@ def make(debug=False, gapi_keys:Dict[str]=API_KEYS):
 
     # google API keys
     for key, value in gapi_keys.items():
-        args.append(f"{key}=\"{dstr}\"")
+        args.append(f"{key}=\"{value}\"")
+    
+    return args

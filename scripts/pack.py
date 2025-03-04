@@ -2,11 +2,14 @@
 
 import shutil
 from pathlib import Path
+import os
 
 from utils import BUILD, RELEASE
 
 def pack_build():
     # https://salsa.debian.org/chromium-team/chromium/-/blob/master/BUILDian/chromium.install
+    if (not RELEASE.is_dir()) or len(os.listdir(RELEASE))==0:
+        raise ValueError("Chrome hasn't been compiled yet")
     
     BUILD.mkdir(parents=True, exist_ok=True)
     

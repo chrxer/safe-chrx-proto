@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 
-from utils import SRC, git, gclient_, PATCH, WRK
+from utils import SRC, git_, gclient_, PATCH, WRK
 import shutil
 
 
 
 def patch(reset=True):
     if reset:
-        git.reset(SRC)
+        git_.reset(SRC)
     shutil.copytree(PATCH.joinpath("chromium"), WRK.joinpath("chromium"), dirs_exist_ok=True)
     gclient_.sync()
 

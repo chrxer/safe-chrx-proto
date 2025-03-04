@@ -8,8 +8,8 @@ def set_max_g(size:int=30):
 def sv():
     exc("ccache", "-sv")
 
-def sv():
-    exc("ccache", "-sv")
+def z():
+    exc("ccache", "-z")
 
 def clear():
     res = input("Are you sure you want to clear all Ccache ?\n:")

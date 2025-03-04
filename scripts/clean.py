@@ -9,10 +9,7 @@ def clean(_target):
     rmtree(OUT.joinpath(_target).resolve())
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: scripts/clean.py <target>", file=sys.stderr)
-        sys.exit(1)
-    
-    _target = sys.argv[1]
-    clean(_target)
+    if len(sys.argv) == 2:
+        target = sys.argv[1]
+        clean(target)
     git_.reset(SRC)

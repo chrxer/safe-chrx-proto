@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# only used for deps.sh
+
 # Function to fetch commit hash from a given Chromium tag
 get_commit_from_tag() {
     local tag="$1"
