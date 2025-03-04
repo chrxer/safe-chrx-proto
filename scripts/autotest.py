@@ -13,7 +13,7 @@ def test(target:str):
     gn(outdir=OUTR, debug=True)
     ccache_.show()
     ccache_.z()
-    pyexc(str(SRC.joinpath("tools/autotest.py")), "-C" ,OUTR, "os_crypt_unittest.cc", cwd=SRC)
+    pyexc(str(SRC.joinpath("tools/autotest.py")), "-C" ,OUTR, target, cwd=SRC)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
