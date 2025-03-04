@@ -8,7 +8,6 @@ from typing import Union
 
 import shlex
 from os import PathLike
-import re
 
 
 def fsize(path:PathLike=SRC) -> int:
