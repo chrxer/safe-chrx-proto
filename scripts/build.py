@@ -44,7 +44,7 @@ def build(target:str="chrome",debug:bool=False):
     stamp = datetime.datetime.now().strftime("%m-%d %H:%M:%S")
     print(f"\033[94m[MOD {stamp}]\033[0m Building finished")
 
-    if not debug:
+    if target=="chrome" and (not debug):
         pack_build()
 
 if __name__ == "__main__":
