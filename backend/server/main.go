@@ -50,5 +50,5 @@ func main() {
 	http.HandleFunc("/encrypt", handleEncrypt)
 	http.HandleFunc("/decrypt", handleDecrypt)
 
-	http.ListenAndServe(":3333", nil)
+	http.ListenAndServe("localhost:3333", nil)
 }

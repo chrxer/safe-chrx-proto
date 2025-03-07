@@ -1,7 +1,48 @@
 {
   "files.associations": {
     "*/.gclient": "python",
-    "*/*.gn": "plaintext"
+    "*/*.gn": "plaintext",
+    "atomic": "cpp",
+    "bit": "cpp",
+    "*.tcc": "cpp",
+    "bitset": "cpp",
+    "cmath": "cpp",
+    "compare": "cpp",
+    "concepts": "cpp",
+    "cstddef": "cpp",
+    "cstdint": "cpp",
+    "cstdio": "cpp",
+    "cstdlib": "cpp",
+    "cstring": "cpp",
+    "cwchar": "cpp",
+    "vector": "cpp",
+    "exception": "cpp",
+    "algorithm": "cpp",
+    "functional": "cpp",
+    "iterator": "cpp",
+    "memory": "cpp",
+    "memory_resource": "cpp",
+    "optional": "cpp",
+    "random": "cpp",
+    "string": "cpp",
+    "string_view": "cpp",
+    "tuple": "cpp",
+    "type_traits": "cpp",
+    "utility": "cpp",
+    "initializer_list": "cpp",
+    "iosfwd": "cpp",
+    "limits": "cpp",
+    "new": "cpp",
+    "ostream": "cpp",
+    "sstream": "cpp",
+    "stdexcept": "cpp",
+    "streambuf": "cpp",
+    "typeinfo": "cpp",
+    "variant": "cpp",
+    "__verbose_abort": "cpp",
+    "execution": "cpp",
+    "ios": "cpp",
+    "locale": "cpp"
   },
   "terminal.integrated.env.linux": {
     "PATH": "${workspaceFolder}/scripts/.venv/bin:${workspaceFolder}/depot_tools:${env:PATH}:/usr/local/go/bin"
@@ -12,8 +53,8 @@
   "C_Cpp.files.exclude": {
     "**/.vscode": true,
     "**/.vs": true,
-    "chromium/**":true,
-    "build/*":true
+    "${workspaceFolder}/chromium/src/**":false,
+    "${workspaceFolder}/build/*":true
   },
   "python.analysis.extraPaths":[
     "${workspaceFolder}/depot_tools",

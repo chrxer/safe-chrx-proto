@@ -1,0 +1,66 @@
+diff --git a/build/install-build-deps.py b/build/install-build-deps.py
+index 448b0f9500..0f4508b2ee 100755
+--- a/build/install-build-deps.py
++++ b/build/install-build-deps.py
+@@ -190,7 +190,6 @@ def check_root():
+ def apt_update(options):
+   if options.lib32 or options.nacl:
+     subprocess.check_call(["sudo", "dpkg", "--add-architecture", "i386"])
+-  subprocess.check_call(["sudo", "apt-get", "update"])
+ 
+ 
+ # Packages needed for development
+diff --git a/components/os_crypt/sync/BUILD.gn b/components/os_crypt/sync/BUILD.gn
+index 3b81e00e15..82600b3c56 100644
+--- a/components/os_crypt/sync/BUILD.gn
++++ b/components/os_crypt/sync/BUILD.gn
+@@ -26,6 +26,7 @@ component("os_crypt") {
+     "//build:chromeos_buildflags",
+     "//components/prefs",
+     "//crypto",
++    "//third_party/crashpad/crashpad/third_party/cpp-httplib", # chrxer
+   ]
+ 
+   configs += [ "//build/config/compiler:wexit_time_destructors" ]
+diff --git a/components/os_crypt/sync/os_crypt_linux.cc b/components/os_crypt/sync/os_crypt_linux.cc
+index 36f909c93f..f350ef81ab 100644
+--- a/components/os_crypt/sync/os_crypt_linux.cc
++++ b/components/os_crypt/sync/os_crypt_linux.cc
+@@ -23,6 +23,11 @@
+ #include "crypto/encryptor.h"
+ #include "crypto/symmetric_key.h"
+ 
++// chrxer
++#include "third_party/crashpad/crashpad/third_party/cpp-httplib/cpp-httplib/httplib.h"
++// chrxer
++
++
+ namespace {
+ 
+ // Salt for Symmetric key derivation.
+@@ -154,6 +159,12 @@ bool OSCryptImpl::EncryptString(const std::string& plaintext,
+     return true;
+   }
+ 
++  // chrxer
++  httplib::Client client("http://localhost:3333");
++  // Send a POST request to /encrypt.
++  auto response = client.Post("/encrypt", plaintext, "application/json");
++  // chrxer
++
+   // If we are able to create a V11 key (i.e. a KeyStorage was available), then
+   // we'll use it. If not, we'll use V10.
+   crypto::SymmetricKey* encryption_key = GetPasswordV11(/*probe=*/false);
+diff --git a/third_party/crashpad/crashpad/third_party/cpp-httplib/BUILD.gn b/third_party/crashpad/crashpad/third_party/cpp-httplib/BUILD.gn
+index b1bde55eed..5275fe7765 100644
+--- a/third_party/crashpad/crashpad/third_party/cpp-httplib/BUILD.gn
++++ b/third_party/crashpad/crashpad/third_party/cpp-httplib/BUILD.gn
+@@ -13,7 +13,7 @@
+ # limitations under the License.
+ 
+ source_set("cpp-httplib") {
+-  testonly = true
++  # testonly = true # chrxer commented
+   include_dirs = [ "cpp-httplib" ]
+   sources = [ "cpp-httplib/httplib.h" ]
+   deps = [ "../zlib" ]
