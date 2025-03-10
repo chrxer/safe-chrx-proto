@@ -80,12 +80,12 @@ func decrypt(b []byte) []byte {
 
 func getMasterPassword() []byte {
 	/* FOR TESTING PURPOSES */
-	masterKey = NewSHA256([]byte("a"))
+	// masterKey = NewSHA256([]byte("a"))
 	/* ********************* */
 
 	if len(masterKey) == 0 {
-		// Get Masterkey
-		return make([]byte, 32)
+		masterKey = NewSHA256(requirePassword())
+		return masterKey
 	} else {
 		return masterKey
 	}
