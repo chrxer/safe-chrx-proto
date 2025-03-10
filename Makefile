@@ -16,4 +16,4 @@ test:
 	scripts/autotest.py os_crypt_unittest.cc
 
 clean:
-	scripts/clean.py Release
+	scripts/clean.py
