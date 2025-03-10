@@ -1,0 +1,5 @@
+tree-sitter
+requests
+types-requests
+httplib2
+pyjson5

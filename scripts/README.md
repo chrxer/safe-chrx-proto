@@ -3,11 +3,11 @@
 ### deps.sh
 Install or reset & update all dependencies.
 
-### patch.sh
+### patch.py
 Apply chrx patches to chromium
 
-### clean.sh
-Revert all patches to chromium
+### clean.py Release
+Clean Release and reset src
 
 ### build.sh
 Build chromium (release)

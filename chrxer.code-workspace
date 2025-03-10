@@ -1,0 +1,42 @@
+{
+	"folders": [
+		{
+			"name": "chromium",
+			"path": "chromium/src"
+		},
+		{
+			"name": "chrxer",
+			"path": "."
+		},
+		{
+			"name": "backend",
+			"path": "backend"
+		},
+		
+	],
+	"settings": {
+		"files.exclude": {
+			"**/.git": false
+		},
+		"problems.decorations.enabled": false,
+		"problems.autoReveal": false,
+		"terminal.integrated.env.linux": {
+			"PATH": "${workspaceFolder}/scripts/.venv/bin:${workspaceFolder}/depot_tools:${workspaceFolder}/../../scripts/.venv/bin:${workspaceFolder}/../../depot_tools:${env:PATH}:/usr/local/go/bin"
+		},
+		"git.repositoryScanIgnoredFolders": [
+			"node_modules",
+			"chromium/src"
+		], 
+	},
+	"extensions": {
+		"recommendations": [
+			"golang.go",
+			"google.cros-ide",
+			"ms-vscode.cpptools",
+			"ms-python.python",
+			"ms-python.debugpy",
+			"google.vscode-mojom"
+		],
+		"unwantedRecommendations": ["twxs.cmake"]
+	}
+}

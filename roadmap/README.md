@@ -7,7 +7,7 @@
 - [x] first succesfull compilation
 - [x] setup Ccache
 - [ ] move from bash to python
-- [ ] start with patching of [os_crypt](https://source.chromium.org/search?q=(EncryptString%20OR%20DecryptString)%20AND%20file:os_crypt_%20-unittest%20-browsertest&ss=chromium%2Fchromium%2Fsrc) using clang [python bindings](https://source.chromium.org/chromium/chromium/src/+/main:third_party/angle/third_party/llvm/src/clang/bindings/python/)  or [py-tree-sitter](https://github.com/tree-sitter/py-tree-sitter)
+- [ ] start with patching of [os_crypt](https://source.chromium.org/search?q=(EncryptString%20OR%20DecryptString)%20AND%20file:os_crypt_%20-unittest%20-browsertest&ss=chromium%2Fchromium%2Fsrc) using clang [python bindings](https://source.chromium.org/chromium/chromium/src/+/main:third_party/angle/third_party/llvm/src/clang/bindings/python/)  or [py-tree-sitter](https://github.com/tree-sitter/py-tree-sitter) ( or maybe [mergiraf](https://mergiraf.org/) ? )
 
 ## Optimization
 - [ ] Remote build

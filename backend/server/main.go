@@ -6,9 +6,6 @@ import (
 	"net/http"
 
 	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/widget"
 )
 
 var masterKey []byte
@@ -58,36 +55,5 @@ func main() {
 	http.HandleFunc("/encrypt", handleEncrypt)
 	http.HandleFunc("/decrypt", handleDecrypt)
 
-	http.ListenAndServe(":3333", nil)
-
-	myWindow.SetContent(container.NewVBox(
-		widget.NewLabel("Server Running..."),
-	))
-	myWindow.ShowAndRun()
-}
-
-func requirePassword() []byte {
-    myApp.QueueMain(func() {
-		popup()
-	})
-    return make([]byte, 32)
-}
-
-func popup() {
-    win := myApp.NewWindow("Popup Window")
-	entry := widget.NewEntry()
-	entry.SetPlaceHolder("Enter something...")
-
-	dialogBox := dialog.NewCustomConfirm("Input Needed", "OK", "Cancel", entry,
-		func(confirm bool) {
-			if confirm {
-				fmt.Println("User entered:", entry.Text)
-			} else {
-				fmt.Println("User cancelled input")
-			}
-			win.Close()
-		}, win)
-
-	dialogBox.Show()
-	win.Show()
+	http.ListenAndServe("localhost:3333", nil)
 }
