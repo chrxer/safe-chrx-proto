@@ -1,18 +1,14 @@
 {
-  "files.associations": {
-    "*/.gclient": "python",
-    "*/*.gn": "plaintext"
-  },
-  "terminal.integrated.env.linux": {
-    "PATH": "${workspaceFolder}/depot_tools:${env:PATH}:/usr/local/go/bin"
-  },
-  "files.exclude": {
-    "**/.git": false
-  },
-  "C_Cpp.files.exclude": {
-    "**/.vscode": true,
-    "**/.vs": true,
-    "chromium/**":true,
-    "build/*":true
-  }
+	"files.exclude": {
+		"${workspaceFolder}/chromium/src/":true,
+		"${workspaceFolder}/build/*":true
+	},
+	"python.analysis.extraPaths":[
+		"${workspaceFolder}/depot_tools",
+		"${workspaceFolder}/scripts"
+	],
+	"python.defaultInterpreterPath":"${workspaceFolder}/scripts/.venv/bin/python",
+	"git.repositoryScanIgnoredFolders": [
+		"depot_tools"
+	]
 }

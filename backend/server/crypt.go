@@ -13,7 +13,7 @@ import (
 
 func encrypt(b []byte) []byte {
 	if len(b) == 0 {
-		return []byte("")		
+		return []byte("")
 	}
 
 	mP := getMasterPassword()
@@ -39,7 +39,7 @@ func encrypt(b []byte) []byte {
 	//Encrypt the data using aesGCM.Seal
 	//Since we don't want to save the nonce somewhere else in this case, we add it as a prefix to the encrypted data. The first nonce argument in Seal is the prefix.
 	ciphertext := aesGCM.Seal(nonce, nonce, b, nil)
-	fmt.Printf("ciphertext: %v\n", ciphertext)
+	fmt.Printf("cleartext:%s\nciphertext: %s\n", b, ciphertext)
 
 	return ciphertext
 }
@@ -76,7 +76,6 @@ func decrypt(b []byte) []byte {
 	fmt.Printf("decrypt: %v", plaintext)
 	return plaintext
 }
-
 
 func getMasterPassword() []byte {
 	/* FOR TESTING PURPOSES */

@@ -8,4 +8,6 @@ build.old/
 args.gn
 ccache.tar.gz*
 
+__pycache__
+
 !patch/chromium
