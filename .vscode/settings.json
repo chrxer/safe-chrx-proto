@@ -10,5 +10,7 @@
 	"python.defaultInterpreterPath":"${workspaceFolder}/scripts/.venv/bin/python",
 	"git.repositoryScanIgnoredFolders": [
 		"depot_tools"
-	]
+	],
+	"git.detectSubmodulesLimit":20,
+	"git.ignoreSubmodules": false,
 }
