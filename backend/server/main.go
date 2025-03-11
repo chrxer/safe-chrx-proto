@@ -4,6 +4,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/widget"
+	"fyne.io/fyne/v2/driver/desktop"
 )
 
 var masterKey []byte
@@ -45,10 +50,58 @@ func testPost(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-func main() {
-	http.HandleFunc("/", getRoot)
-	http.HandleFunc("/encrypt", handleEncrypt)
-	http.HandleFunc("/decrypt", handleDecrypt)
+var myApp fyne.App
+var myWindow fyne.Window
 
-	http.ListenAndServe("localhost:3333", nil)
+func serve() {
+		http.HandleFunc("/", getRoot)
+		http.HandleFunc("/encrypt", handleEncrypt)
+		http.HandleFunc("/decrypt", handleDecrypt)
+		err := http.ListenAndServe("localhost:3333", nil)
+		if err != nil {
+			// Handle the error appropriately
+		}
+	}
+
+func main() {
+	myApp := app.New()
+	var myWindow fyne.Window
+
+	drv := myApp.Driver()
+	if drv, ok := drv.(desktop.Driver); ok {
+		myWindow = drv.CreateSplashWindow()
+	} else {
+		myWindow = myApp.NewWindow("Couldn't create splash window")
+	}
+
+	go serve()
+	go myWindow.Hide() // put this one into a function with a slight delay (after myWindow hsa started up)
+	myWindow.ShowAndRun()
+}
+
+
+func requirePassword() []byte {
+	POPUP()
+	return []byte("a")
+}
+
+
+func POPUP() {
+	myWindow.Hide()
+	win := myApp.NewWindow("Popup Window")
+	entry := widget.NewEntry()
+	entry.SetPlaceHolder("Enter something...")
+
+	dialogBox := dialog.NewCustomConfirm("Input Needed", "OK", "Cancel", entry,
+		func(confirm bool) {
+			if confirm {
+				fmt.Println("User entered:", entry.Text)
+			} else {
+				fmt.Println("User cancelled input")
+			}
+			win.Close()
+		}, win)
+
+	dialogBox.Show()
+	win.Show()
 }
