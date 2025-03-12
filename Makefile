@@ -3,6 +3,9 @@
 deps:
 	scripts/deps.sh
 
+diff:
+	scripts/diff.py
+
 patch:
 	scripts/patch.py
 

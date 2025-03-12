@@ -5,6 +5,7 @@ from utils.wrap import exc
 import shutil
 from pathlib import Path
 from os.path import relpath
+from clean import clean
 
 def _logpath(path, names):
     for name in names:
@@ -22,12 +23,13 @@ def _logpath(path, names):
 def cpr(src, dst):
     shutil.copytree(src, dst, dirs_exist_ok=True, ignore=_logpath)
 
-def patch(reset=True):
-    if reset:
-        git_.reset(SRC)
+def patch(_clean=True):
+    if _clean:
+        clean()
+        
     gclient_.sync()
     cpr(PATCH.joinpath("chromium"), WRK.joinpath("chromium"))
-    # cpr(SRC.joinpath("tools/vscode/"), SRC.joinpath(".vscode"))
+    # cpr(SRC.joinpasth("tools/vscode/"), SRC.joinpath(".vscode"))
     exc("git","apply", str(WRK.joinpath("os_crypt.patch")), cwd=SRC,_pidx=3)
 
 

@@ -1,3 +1,0 @@
-[submodule "patch/chromium/src/chrx/third_party/HTTPRequest"]
-	path = patch/chromium/src/chrx/third_party/HTTPRequest
-	url = https://github.com/elnormous/HTTPRequest
