@@ -11,14 +11,14 @@ index 590f4c94f2..1b7c23f154 100644
  
  Chromium is an open-source browser project that aims to build a safer, faster,
 diff --git a/components/os_crypt/sync/BUILD.gn b/components/os_crypt/sync/BUILD.gn
-index 3b81e00e15..169010b490 100644
+index 3b81e00e15..bb5746d243 100644
 --- a/components/os_crypt/sync/BUILD.gn
 +++ b/components/os_crypt/sync/BUILD.gn
 @@ -26,6 +26,7 @@ component("os_crypt") {
      "//build:chromeos_buildflags",
      "//components/prefs",
      "//crypto",
-+    "//chrx:os_crypt_hook", # chrxer
++    "//chrx:chrx", # chrxer
    ]
  
    configs += [ "//build/config/compiler:wexit_time_destructors" ]

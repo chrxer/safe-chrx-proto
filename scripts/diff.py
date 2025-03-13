@@ -12,7 +12,7 @@ def diff():
     stamp = datetime.datetime.now().strftime("%m-%d %H:%M:%S")
     print(f"\033[94m[MOD {stamp}]\033[0m creating git diff (excluding added files)")
 
-    diff = exc("git","diff", "--diff-filter=MD", cwd=SRC, _bytes=True, dbg=False)
+    diff = exc("git","diff", "--diff-filter=MD","--patience", "--submodule=diff", cwd=SRC, _bytes=True, dbg=False)
     with open(WRK.joinpath("os_crypt.patch"), "wb") as f:
         f.seek(0)
         f.write(diff)
