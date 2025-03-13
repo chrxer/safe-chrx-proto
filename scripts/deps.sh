@@ -7,8 +7,10 @@ set -e
 # Loop through arguments
 for arg in "$@"; do
     if [[ "$arg" == "--force" || "$arg" == "-f" ]]; then
-        echo "--force provided"
         FORCE=1
+    else
+        echo "Invalid argument: $arg"
+        exit 1
     fi
 done
 
@@ -51,14 +53,11 @@ gsync() {
     nsu gclient sync --force --nohooks --no-history --shallow --jobs 8 --revision src@$COMMIT
 }
 
-
-
 if [ ! -d "$WRK/depot_tools" ]; then
     nsu git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 fi
 
-
-if [[ -d "$CHROMIUM/src" || $FORCE ]]; then
+if [[ ! -d "$CHROMIUM/src" ]] || [[ "$FORCE" == "1" ]]; then
     nsu mkdir -p "$CHROMIUM"
     cd "$CHROMIUM"
     nsu git config protocol.version 2
@@ -74,6 +73,8 @@ fi
 set +e
 nsu sed -i '/subprocess\.check_call\s*(\s*\["sudo",\s*"apt-get",\s*"update"\s*\]\s*)/d' "$CHROMIUM/src/build/install-build-deps.py"
 asu "$CHROMIUM/src/build/install-build-deps.sh"
+nsu mkdir -p "$CHROMIUM/src/out/Debug"
+nsu ln -s "$CHROMIUM/src/out/Debug" "$CHROMIUM/src/out/current_link"
 cd $WRK
 
 set +e

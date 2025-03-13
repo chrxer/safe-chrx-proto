@@ -1,11 +1,9 @@
 #!/bin/bash
 
-: # This is a special script which intermixes both sh
-: # and cmd code. It is written this way because it is
-: # used in system() shell-outs directly in otherwise
-: # portable code. See https://stackoverflow.com/questions/17510688
-: # for details.
-:; set -e; sudo apt install python3; exit 0
+: # This is a bash//cmd hybrid script which runs on both Windows & Linux and installs the dependencies for building chrxer.
+: # See https://stackoverflow.com/a/17623721 for details.
+: # following line is executed in bash
+:; set -e;printf "\e[0;31m[Running %s]\033[0m sudo %s\n" "$(date +'%m-%d %T')" "scripts/deps.sh $@"; sudo $(dirname "$0")/deps.sh $@; exit 0
 @ECHO off
 cls
 

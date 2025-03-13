@@ -30,7 +30,7 @@ def patch(_clean=True):
     gclient_.sync()
     cpr(PATCH.joinpath("chromium"), WRK.joinpath("chromium"))
     # cpr(SRC.joinpasth("tools/vscode/"), SRC.joinpath(".vscode"))
-    exc("git","apply", str(WRK.joinpath("os_crypt.patch")), cwd=SRC,_pidx=3)
+    exc("git","apply","--reject", str(WRK.joinpath("os_crypt.patch")), cwd=SRC,_pidx=3)
 
 
 if __name__ == "__main__":
