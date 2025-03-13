@@ -23,8 +23,8 @@ stmp() {
     date +"%m-%d %T"
 }
 
-printf "\033[94m[EXC %s]\033[0m sudo %s\n" "$(stmp)" "apt install python3"
-sudo apt install python3
+printf "\033[94m[EXC %s]\033[0m sudo %s\n" "$(stmp)" "apt install python3 make"
+sudo apt install python3 make
 
 USER=$(awk -F: '$3 >= 1000 && $3 < 60000 {print $1; exit}' /etc/passwd)
 
