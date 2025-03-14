@@ -87,7 +87,7 @@
   "git.autofetch": false,
   "git.enabled":false,
   "git.repositoryScanMaxDepth": 20,
-  "git.ignoreSubmodules": false,
+  "git.ignoreSubmodules": true,
   // Optional: Do not open files in 'preview' mode. Opening a new file in can
   //           replace an existing one in preview mode, which can be confusing.
   //"workbench.editor.enablePreview": false,

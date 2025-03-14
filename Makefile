@@ -1,7 +1,7 @@
 .PHONY: deps patch build
 
 deps:
-	scripts/deps.sh
+	scripts/deps.bat
 
 diff:
 	scripts/diff.py

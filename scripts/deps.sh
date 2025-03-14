@@ -43,7 +43,13 @@ asu() {
 }
 
 nsu python3 -m venv scripts/.venv
-nsu scripts/.venv/bin/python -m pip install -r scripts/requirements.txt
+PYTHON=$WRK/scripts/.venv/bin/python
+nsu $PYTHON -m pip install --upgrade pip
+nsu $PYTHON -m pip install -r $WRK/scripts/requirements.txt
+nsu $PYTHON -m pip uninstall -y pyjson5
+nsu pip install --break-system-packages --upgrade pip
+nsu python3 -m pip uninstall -y --break-system-packages pyjson5
+
 
 VERSION=$(cat "$WRK/chromium.version")
 COMMIT=$(sudo -u "$USER" env "PATH=$PATH" "$WRK/scripts/utils/git_.py")
@@ -74,7 +80,7 @@ set +e
 nsu sed -i '/subprocess\.check_call\s*(\s*\["sudo",\s*"apt-get",\s*"update"\s*\]\s*)/d' "$CHROMIUM/src/build/install-build-deps.py"
 asu "$CHROMIUM/src/build/install-build-deps.sh"
 nsu mkdir -p "$CHROMIUM/src/out/Debug"
-nsu ln -s "$CHROMIUM/src/out/Debug" "$CHROMIUM/src/out/current_link"
+nsu ln -sf "$CHROMIUM/src/out/Debug" "$CHROMIUM/src/out/current_link"
 cd $WRK
 
 set +e
