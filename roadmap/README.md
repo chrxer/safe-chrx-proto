@@ -10,6 +10,7 @@
   - [ ] also for deps.sh
 - [x] pass `os_crypt_unittest.cc` with external encryption server
 - [ ] implement patching of [os_crypt](https://source.chromium.org/search?q=(EncryptString%20OR%20DecryptString)%20AND%20file:os_crypt_%20-unittest%20-browsertest&ss=chromium%2Fchromium%2Fsrc) over [py-tree-sitter](https://github.com/tree-sitter/py-tree-sitter) ( or maybe [mergiraf](https://mergiraf.org/) ? )
+- [ ] move from `third_party/crashpad/crashpad/third_party/cpp-httplib/` to [SimpleURLLoader](https://github.com/brave/brave-browser/wiki/Simple-Guide-to-SimpleURLLoader) (Guide)
 
 ## Optimization
 - [ ] Implement remote build over [hetzner.com/cloud](https://www.hetzner.com/cloud/) using [setup-hcloud](https://github.com/hetznercloud/setup-hcloud) github action ([cli docs](https://github.com/hetznercloud/cli)
