@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/widget"
 	"fyne.io/fyne/v2/driver/desktop"
+	"fyne.io/fyne/v2/widget"
 )
 
 var masterKey []byte
@@ -59,14 +60,14 @@ func serve() {
 		http.HandleFunc("/decrypt", handleDecrypt)
 		err := http.ListenAndServe("localhost:3333", nil)
 		if err != nil {
+			fmt.Printf("Server error")
 			// Handle the error appropriately
 		}
 	}
 
 func main() {
-	myApp := app.New()
-	var myWindow fyne.Window
-
+	myApp = app.New()
+	// var myWindow fyne.Window
 	drv := myApp.Driver()
 	if drv, ok := drv.(desktop.Driver); ok {
 		myWindow = drv.CreateSplashWindow()
@@ -75,19 +76,25 @@ func main() {
 	}
 
 	go serve()
-	go myWindow.Hide() // put this one into a function with a slight delay (after myWindow hsa started up)
-	myWindow.ShowAndRun()
+	myWindow.Hide()
+	myApp.Run()
 }
 
 
 func requirePassword() []byte {
-	POPUP()
-	return []byte("a")
+	output := POPUP()
+	fmt.Printf(output)
+	if(output != nil) {
+		return []byte(output)
+	} else {
+		return []byte("")
+	}
 }
 
 
-func POPUP() {
-	myWindow.Hide()
+func POPUP() string {
+	output string
+
 	win := myApp.NewWindow("Popup Window")
 	entry := widget.NewEntry()
 	entry.SetPlaceHolder("Enter something...")
@@ -95,7 +102,7 @@ func POPUP() {
 	dialogBox := dialog.NewCustomConfirm("Input Needed", "OK", "Cancel", entry,
 		func(confirm bool) {
 			if confirm {
-				fmt.Println("User entered:", entry.Text)
+				output = entry.Text
 			} else {
 				fmt.Println("User cancelled input")
 			}
@@ -104,4 +111,6 @@ func POPUP() {
 
 	dialogBox.Show()
 	win.Show()
+
+	return output
 }
