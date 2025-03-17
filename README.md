@@ -17,11 +17,13 @@ See [roadmap](roadmap/)
 
 ## Building
 
+see [CONTRIBUTING.md](CONTRIBUTING.md)
+
 <details>
 
 <summary>on EC2</summary>
 
-Build time without existing Ccache on:
+Build time without existing Ccache on EC2:
 ```
 c5ad.2xlarge: 0.344 USD/h
 Compillation start: ~ 9 min. -> 0.05 USD

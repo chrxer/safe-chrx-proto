@@ -35,6 +35,9 @@ def reset(cwd=SRC):
     exc("git", "clean", "-d", "--force", cwd=cwd)
     exc("git","reset", "--hard", "--recurse-submodules", cwd=cwd)
 
+def sub_update(cwd=SRC):
+    exc("git", "submodule", "update","--recursive", "--remote")
+
 def get_commit_from_tag(tag:str=VERSION):
     url=f"https://chromium.googlesource.com/chromium/src.git/+/{tag}?format=JSON"
 

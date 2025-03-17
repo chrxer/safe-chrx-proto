@@ -16,7 +16,7 @@ def gn(outdir:str,target:str="chrome",debug:bool=False):
     if len(targs) > 1:
         root_target=targs[0]
 
-    ccache_.set_max_g(30)
+    ccache_.set_max_g(20)
     poutdir = SRC.joinpath(outdir)
     args = mkargs.make(debug=debug)
     pargs= ' '.join(args)

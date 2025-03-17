@@ -9,6 +9,9 @@
 	],
 	"python.defaultInterpreterPath":"${workspaceFolder}/scripts/.venv/bin/python",
 	"git.repositoryScanIgnoredFolders": [
-		"depot_tools"
-	]
+		"depot_tools",
+		"chromium"
+	],
+	"git.detectSubmodulesLimit":20,
+	"git.ignoreSubmodules": false,
 }

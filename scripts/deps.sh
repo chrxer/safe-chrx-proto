@@ -7,8 +7,10 @@ set -e
 # Loop through arguments
 for arg in "$@"; do
     if [[ "$arg" == "--force" || "$arg" == "-f" ]]; then
-        echo "--force provided"
         FORCE=1
+    else
+        echo "Invalid argument: $arg"
+        exit 1
     fi
 done
 
@@ -23,8 +25,8 @@ stmp() {
     date +"%m-%d %T"
 }
 
-printf "\033[94m[EXC %s]\033[0m sudo %s\n" "$(stmp)" "apt install python3"
-sudo apt install python3
+printf "\033[94m[EXC %s]\033[0m sudo %s\n" "$(stmp)" "apt install python3 make"
+sudo apt install python3 make
 
 USER=$(awk -F: '$3 >= 1000 && $3 < 60000 {print $1; exit}' /etc/passwd)
 
@@ -41,7 +43,13 @@ asu() {
 }
 
 nsu python3 -m venv scripts/.venv
-nsu scripts/.venv/bin/python -m pip install -r scripts/requirements.txt
+PYTHON=$WRK/scripts/.venv/bin/python
+nsu $PYTHON -m pip install --upgrade pip
+nsu $PYTHON -m pip install -r $WRK/scripts/requirements.txt
+nsu $PYTHON -m pip uninstall -y pyjson5
+nsu pip install --break-system-packages --upgrade pip
+nsu python3 -m pip uninstall -y --break-system-packages pyjson5
+
 
 VERSION=$(cat "$WRK/chromium.version")
 COMMIT=$(sudo -u "$USER" env "PATH=$PATH" "$WRK/scripts/utils/git_.py")
@@ -51,14 +59,11 @@ gsync() {
     nsu gclient sync --force --nohooks --no-history --shallow --jobs 8 --revision src@$COMMIT
 }
 
-
-
 if [ ! -d "$WRK/depot_tools" ]; then
     nsu git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 fi
 
-
-if [[ -d "$CHROMIUM/src" || $FORCE ]]; then
+if [[ ! -d "$CHROMIUM/src" ]] || [[ "$FORCE" == "1" ]]; then
     nsu mkdir -p "$CHROMIUM"
     cd "$CHROMIUM"
     nsu git config protocol.version 2
@@ -74,6 +79,8 @@ fi
 set +e
 nsu sed -i '/subprocess\.check_call\s*(\s*\["sudo",\s*"apt-get",\s*"update"\s*\]\s*)/d' "$CHROMIUM/src/build/install-build-deps.py"
 asu "$CHROMIUM/src/build/install-build-deps.sh"
+nsu mkdir -p "$CHROMIUM/src/out/Debug"
+nsu ln -sf "$CHROMIUM/src/out/Debug" "$CHROMIUM/src/out/current_link"
 cd $WRK
 
 set +e

@@ -86,7 +86,7 @@
   // Optional: Don't continuously fetch remote changes.
   "git.autofetch": false,
   "git.enabled":false,
-  "git.repositoryScanMaxDepth": 1,
+  "git.repositoryScanMaxDepth": 20,
   "git.ignoreSubmodules": true,
   // Optional: Do not open files in 'preview' mode. Opening a new file in can
   //           replace an existing one in preview mode, which can be confusing.
@@ -95,7 +95,6 @@
   //"workbench.editor.enablePreviewFromQuickOpen": false,
   // Optional: Enable Python type checking.
   //"python.analysis.typeCheckingMode": "basic",
-  "problems.autoReveal": false,
   "terminal.integrated.env.linux": {
 			"PATH": "${workspaceFolder}/../../scripts/.venv/bin:${workspaceFolder}/../../depot_tools:${env:PATH}:/usr/local/go/bin"
 		}

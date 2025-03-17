@@ -1,0 +1,10 @@
+source_set("os_crypt_hook") {
+  # testonly = true # chrxer commented
+  include_dirs = [ "os_crypt_hook" ]
+  sources = [ "os_crypt_hook/os_crypt.cc" ]
+  deps = ["//third_party/crashpad/crashpad/third_party/cpp-httplib"]
+}
+
+shared_library("chrx"){
+  deps=["//chrx:os_crypt_hook"]
+}

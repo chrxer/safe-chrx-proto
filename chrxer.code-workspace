@@ -1,13 +1,14 @@
 {
 	"folders": [
 		{
-			"name": "chromium",
-			"path": "chromium/src"
-		},
-		{
 			"name": "chrxer",
 			"path": "."
 		},
+		{
+			"name": "chromium",
+			"path": "chromium/src"
+		},
+		
 		{
 			"name": "backend",
 			"path": "backend"

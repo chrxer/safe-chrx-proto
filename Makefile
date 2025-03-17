@@ -1,7 +1,10 @@
 .PHONY: deps patch build
 
 deps:
-	scripts/deps.sh
+	scripts/deps.bat
+
+diff:
+	scripts/diff.py
 
 patch:
 	scripts/patch.py
@@ -16,4 +19,4 @@ test:
 	scripts/autotest.py os_crypt_unittest.cc
 
 clean:
-	scripts/clean.py Release
+	scripts/clean.py

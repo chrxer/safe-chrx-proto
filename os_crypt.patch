@@ -1,5 +1,17 @@
+diff --git a/README.md b/README.md
+index 590f4c94f2..1b7c23f154 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,7 @@
++```bash
++git diff --diff-filter=MD  > ../../os_crypt.patch
++```
++
+ # ![Logo](chrome/app/theme/chromium/product_logo_64.png) Chromium
+ 
+ Chromium is an open-source browser project that aims to build a safer, faster,
 diff --git a/build/install-build-deps.py b/build/install-build-deps.py
-index 448b0f9500..0f4508b2ee 100755
+index 511430592f..f9c9c92fcb 100755
 --- a/build/install-build-deps.py
 +++ b/build/install-build-deps.py
 @@ -190,7 +190,6 @@ def check_root():
@@ -11,46 +23,48 @@ index 448b0f9500..0f4508b2ee 100755
  
  # Packages needed for development
 diff --git a/components/os_crypt/sync/BUILD.gn b/components/os_crypt/sync/BUILD.gn
-index 3b81e00e15..82600b3c56 100644
+index ff1e356ff6..88798d4b8d 100644
 --- a/components/os_crypt/sync/BUILD.gn
 +++ b/components/os_crypt/sync/BUILD.gn
-@@ -26,6 +26,7 @@ component("os_crypt") {
-     "//build:chromeos_buildflags",
+@@ -22,6 +22,7 @@ component("sync") {
+     "//build:chromecast_buildflags",
      "//components/prefs",
      "//crypto",
-+    "//third_party/crashpad/crashpad/third_party/cpp-httplib", # chrxer
++    "//chrx:chrx", # chrxer
    ]
  
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
 diff --git a/components/os_crypt/sync/os_crypt_linux.cc b/components/os_crypt/sync/os_crypt_linux.cc
-index 36f909c93f..f350ef81ab 100644
+index 533cc486cb..31d261136f 100644
 --- a/components/os_crypt/sync/os_crypt_linux.cc
 +++ b/components/os_crypt/sync/os_crypt_linux.cc
-@@ -23,6 +23,11 @@
- #include "crypto/encryptor.h"
+@@ -26,6 +26,8 @@
+ #include "crypto/kdf.h"
  #include "crypto/symmetric_key.h"
  
-+// chrxer
-+#include "third_party/crashpad/crashpad/third_party/cpp-httplib/cpp-httplib/httplib.h"
-+// chrxer
-+
++#include "chrx/os_crypt_hook/os_crypt.cc"
 +
  namespace {
  
- // Salt for Symmetric key derivation.
-@@ -154,6 +159,12 @@ bool OSCryptImpl::EncryptString(const std::string& plaintext,
+ // Prefixes for cypher text returned by obfuscation version.  We prefix the
+@@ -139,6 +141,8 @@ bool OSCryptImpl::EncryptString(const std::string& plaintext,
      return true;
    }
  
-+  // chrxer
-+  httplib::Client client("http://localhost:3333");
-+  // Send a POST request to /encrypt.
-+  auto response = client.Post("/encrypt", plaintext, "application/json");
-+  // chrxer
++  return ChrxEncrypt(plaintext, *ciphertext);
 +
-   // If we are able to create a V11 key (i.e. a KeyStorage was available), then
-   // we'll use it. If not, we'll use V10.
-   crypto::SymmetricKey* encryption_key = GetPasswordV11(/*probe=*/false);
+   base::span<const uint8_t> key;
+ 
+   if (DeriveV11Key()) {
+@@ -162,6 +166,8 @@ bool OSCryptImpl::DecryptString(const std::string& ciphertext,
+     return true;
+   }
+ 
++  return ChrxDecrypt(*plaintext, ciphertext);
++
+   // Check that the incoming ciphertext was encrypted and with what version.
+   // Credit card numbers are current legacy unencrypted data, so false match
+   // with prefix won't happen.
 diff --git a/third_party/crashpad/crashpad/third_party/cpp-httplib/BUILD.gn b/third_party/crashpad/crashpad/third_party/cpp-httplib/BUILD.gn
 index b1bde55eed..5275fe7765 100644
 --- a/third_party/crashpad/crashpad/third_party/cpp-httplib/BUILD.gn
