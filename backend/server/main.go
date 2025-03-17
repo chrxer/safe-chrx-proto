@@ -59,14 +59,14 @@ func serve() {
 		http.HandleFunc("/decrypt", handleDecrypt)
 		err := http.ListenAndServe("localhost:3333", nil)
 		if err != nil {
+			fmt.Printf("Server error")
 			// Handle the error appropriately
 		}
 	}
 
 func main() {
-	myApp := app.New()
-	var myWindow fyne.Window
-
+	myApp = app.New()
+	// var myWindow fyne.Window
 	drv := myApp.Driver()
 	if drv, ok := drv.(desktop.Driver); ok {
 		myWindow = drv.CreateSplashWindow()
@@ -75,7 +75,7 @@ func main() {
 	}
 
 	go serve()
-	go myWindow.Hide() // put this one into a function with a slight delay (after myWindow hsa started up)
+	// go myWindow.Hide() // put this one into a function with a slight delay (after myWindow hsa started up)
 	myWindow.ShowAndRun()
 }
 
