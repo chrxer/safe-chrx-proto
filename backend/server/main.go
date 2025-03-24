@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sync"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -77,40 +78,61 @@ func main() {
 
 	go serve()
 	myWindow.Hide()
+	myWindow.SetMaster()
 	myApp.Run()
+	fmt.Println("App closing..")
 }
 
 
 func requirePassword() []byte {
 	output := POPUP()
-	fmt.Printf(output)
-	if(output != nil) {
-		return []byte(output)
-	} else {
+	if output == "" {
 		return []byte("")
 	}
+
+	// verify password
+
+	return []byte(output)
 }
 
-
 func POPUP() string {
-	output string
+	var output string
+    var wg sync.WaitGroup
+	var win fyne.Window
+	var dialogBox dialog.Dialog
 
-	win := myApp.NewWindow("Popup Window")
-	entry := widget.NewEntry()
-	entry.SetPlaceHolder("Enter something...")
+	/*
+	Create a window outside and hide it. Then within the loop, show it. 
+	Make sure that the window cannot be closed, but rather hides instead.
+	Can also be the main window instead of a pop-up window
+	*/
 
-	dialogBox := dialog.NewCustomConfirm("Input Needed", "OK", "Cancel", entry,
-		func(confirm bool) {
-			if confirm {
-				output = entry.Text
-			} else {
-				fmt.Println("User cancelled input")
-			}
-			win.Close()
-		}, win)
+	for len(output) == 0 {
+		wg.Add(1)
+		win = myApp.NewWindow("Popup Window")
+		win.SetCloseIntercept(func() {
+			win.Hide()
+		})
+		entry := widget.NewEntry()
+		entry.SetPlaceHolder("Enter something...")
+		dialogBox = dialog.NewCustomConfirm("Input Needed", "OK", "Cancel", entry,
+			func(confirm bool) {
+				if confirm{
+					output = entry.Text
+				} else {
+					fmt.Println("User cancelled input")
+				}
+				defer wg.Done()
+			}, win)
 
-	dialogBox.Show()
-	win.Show()
+		dialogBox.Show()
+		win.Show()
+		wg.Wait()
+		win.Close()
+		fmt.Printf("%s", len(output))
+	}
 
-	return output
+	
+
+	return output // -> Put this into the inner function somehow
 }

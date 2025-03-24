@@ -83,8 +83,10 @@ func getMasterPassword() []byte {
 	/* ********************* */
 
 	if len(masterKey) == 0 {
-		masterKey = NewSHA256(requirePassword())
-		// Create an error if len = 0
+		// Do while loop when value is 0
+		for len(masterKey) == 0 {
+			masterKey = NewSHA256(requirePassword())
+		}
 		return masterKey
 	} else {
 		return masterKey
