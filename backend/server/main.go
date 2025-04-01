@@ -2,18 +2,22 @@ package main
 
 import (
 	"fmt"
+	"image/color"
 	"io"
 	"net/http"
 	"sync"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
 )
 
 var masterKey []byte
+var wg sync.WaitGroup
+var userPassword string
 
 func getRoot(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "See https://github.com/chrxer/safe-chrx-proto/tree/main/backend/server\n")
@@ -70,8 +74,44 @@ func main() {
 	myApp = app.New()
 	// var myWindow fyne.Window
 	drv := myApp.Driver()
+
 	if drv, ok := drv.(desktop.Driver); ok {
 		myWindow = drv.CreateSplashWindow()
+
+		myWindow.SetCloseIntercept(func() {
+			wg.Done()
+			myWindow.Hide()
+		})
+
+		entry := widget.NewPasswordEntry()
+		entry.SetPlaceHolder("Enter password...")
+
+		errorLabel := canvas.NewText("Please enter master password...", color.Black)
+		submitButton := widget.NewButton("OK", func() {
+			pswd := entry.Text
+			if len(pswd) < 8 {
+				errorLabel = canvas.NewText("Password is too short", color.RGBA{R: 255, G: 128, B: 128, A: 255})
+			} else if len(pswd) > 32 {
+				errorLabel = canvas.NewText("Password is too long", color.RGBA{R: 255, G: 128, B: 128, A: 255})
+			} else { 
+				if isValid(pswd) {
+					userPassword = pswd;
+					myWindow.Hide()
+					wg.Done()
+				} else {
+					errorLabel = canvas.NewText("Invalid password", color.RGBA{R: 255, G: 128, B: 128, A: 255})
+				}
+			}
+			// Refresh canvas.text somehow?? -> errorLabel.Refresh() nor content.Refresh() work.
+		})
+
+		entry.Resize(fyne.NewSize(100, 0))
+		
+		content := container.NewPadded(container.NewBorder(errorLabel, nil, nil, nil, container.NewBorder(nil, nil, nil, submitButton, entry)))
+
+		myWindow.SetContent(container.NewPadded(content))
+		myWindow.Resize(content.Size())
+
 	} else {
 		myWindow = myApp.NewWindow("Couldn't create splash window")
 	}
@@ -83,56 +123,10 @@ func main() {
 	fmt.Println("App closing..")
 }
 
-
-func requirePassword() []byte {
-	output := POPUP()
-	if output == "" {
-		return []byte("")
+func isValid(pswd string) bool {
+    // -> Golang Argon2
+	if len(pswd) == 0 {
+		return false
 	}
-
-	// verify password
-
-	return []byte(output)
-}
-
-func POPUP() string {
-	var output string
-    var wg sync.WaitGroup
-	var win fyne.Window
-	var dialogBox dialog.Dialog
-
-	/*
-	Create a window outside and hide it. Then within the loop, show it. 
-	Make sure that the window cannot be closed, but rather hides instead.
-	Can also be the main window instead of a pop-up window
-	*/
-
-	for len(output) == 0 {
-		wg.Add(1)
-		win = myApp.NewWindow("Popup Window")
-		win.SetCloseIntercept(func() {
-			win.Hide()
-		})
-		entry := widget.NewEntry()
-		entry.SetPlaceHolder("Enter something...")
-		dialogBox = dialog.NewCustomConfirm("Input Needed", "OK", "Cancel", entry,
-			func(confirm bool) {
-				if confirm{
-					output = entry.Text
-				} else {
-					fmt.Println("User cancelled input")
-				}
-				defer wg.Done()
-			}, win)
-
-		dialogBox.Show()
-		win.Show()
-		wg.Wait()
-		win.Close()
-		fmt.Printf("%s", len(output))
-	}
-
-	
-
-	return output // -> Put this into the inner function somehow
+	return true
 }
