@@ -83,12 +83,17 @@ func getMasterPassword() []byte {
 	/* ********************* */
 
 	if len(masterKey) == 0 {
-		masterKey = NewSHA256(requirePassword())
-		// Create an error if len = 0
-		return masterKey
-	} else {
-		return masterKey
+		for(len(userPassword) == 0) {
+			wg.Add(1)
+			go func() {
+				// dialogBox.Show() // Otherwise the dialogbox is hidden upon closing window
+				myWindow.Show()
+			}()
+			wg.Wait()
+		}
+		masterKey = NewSHA256([]byte(userPassword))
 	}
+	return masterKey
 }
 
 func NewSHA256(data []byte) []byte {
