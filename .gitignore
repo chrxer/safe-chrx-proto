@@ -11,3 +11,4 @@ ccache.tar.gz*
 __pycache__
 
 !patch/chromium
+!patch/chromium/src/build

@@ -57,5 +57,5 @@ def exc(*cmd:Iterable[str],dbg:bool=True, _bytes:bool=False,timeout:float=None, 
             return proc.stdout.read()
         return proc.stdout.read().decode("utf-8")
     
-def pyexc(*cmd:Iterable[str],dbg:bool=True, _bytes:bool=False,timeout:float=None, cwd:PathLike=WRK, _pidx:int=0) -> Union[bytes, str]:
-    return exc(PYTHON, *cmd, dbg=dbg, _bytes=_bytes, timeout=timeout, cwd=cwd, _pidx=_pidx+1)
+def pyexc(*cmd:Iterable[str],dbg:bool=True, _bytes:bool=False,timeout:float=None, cwd:PathLike=WRK, _pidx:int=0, python:PathLike=PYTHON,env:Dict[str,str]=os.environ) -> Union[bytes, str]:
+    return exc(str(python), *cmd, dbg=dbg, _bytes=_bytes, timeout=timeout, cwd=cwd, _pidx=_pidx+1, env=env)

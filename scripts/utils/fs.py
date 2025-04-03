@@ -13,7 +13,7 @@ from os import PathLike
 def fsize(path:PathLike=SRC) -> int:
     # size of path in bytes
     if not IS_LINUX:
-        raise NotImplemented("Only implemented for linux yet")
+        raise NotImplementedError("Only implemented for linux yet")
     path = shlex.quote(str(Path(path).absolute()))
     size = exc("bash","-c",f"du -s -b {path} | awk '{{print $1}}'", dbg=False)
     return int(size)

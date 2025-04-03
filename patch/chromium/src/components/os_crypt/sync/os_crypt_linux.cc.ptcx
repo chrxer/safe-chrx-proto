@@ -1,0 +1,77 @@
+from ptcx import BasePTC
+import re
+from typing import Callable
+from sourcetypes import cpp
+
+from tree_sitter import Parser, Language
+import tree_sitter_cpp
+
+parser = Parser(Language(tree_sitter_cpp.language()))
+
+
+def search_and_insert(text:str, pattern:str, insert_func:Callable[[str], str]):
+    """
+    finds match & replaces inserts string at
+    """
+    match = re.search(pattern, text, flags=re.MULTILINE)
+
+    if not match:
+        raise ValueError(f"Pattern '{pattern}' not found in the text.")
+
+    start, end = match.span(1)
+    matched_text = text[start:end]
+    modified_text = insert_func(matched_text)
+    updated_text = text[:start] + modified_text + text[end:]
+
+    return updated_text
+
+firstcomment = r'^(\s*(?://.*\n|/\*[^*]*\*+(?:[^/*][^*]*\*+)*/\s*\n?)+\s*)\n|^'
+add:cpp = """
+// import added by chrx
+#include "chrx/os_crypt_hook/os_crypt.cc"
+"""
+
+fnbody=r'\s*\{(?>[^{}]+|(?R))*\}'
+
+def body_replace(text: str, signature: str, insert_func: Callable[[str], str]) -> str:
+    tree = parser.parse(bytes(text, "utf8"))
+    root_node = tree.root_node
+    pattern = re.compile(signature+r'\s+\{')
+    
+    for child in root_node.children:
+        if child.type == "function_definition":
+            function_code = text[child.start_byte:child.end_byte]
+            
+            if pattern.search(function_code):
+                for subchild in child.children:
+                    if subchild.type == "compound_statement":
+                        start, end = subchild.start_byte, subchild.end_byte
+                        matched_text = text[start:end]
+                        modified_text = insert_func(matched_text)
+                        updated_text = text[:start] + "{\n" + modified_text + "\n}" + text[end:]
+                        return updated_text
+    raise ValueError(f"Couldn't find signature:{signature}")
+    
+encrypt:cpp=  """
+    if (plaintext.empty()) {
+        ciphertext->clear();
+        return true;
+    }
+
+    return ChrxEncrypt(plaintext, *ciphertext);
+"""
+
+decrypt:cpp="""
+    if (ciphertext.empty()) {
+        plaintext->clear();
+        return true;
+    }
+
+    return ChrxDecrypt(*plaintext, ciphertext);
+"""
+
+class PTC(BasePTC):
+    def patch(self):
+        self.str = search_and_insert(self.str, firstcomment, lambda s:s+add)
+        self.str=body_replace(self.str,r'bool\s+OSCryptImpl::EncryptString\s*\(const\s+std::string&\s+plaintext,\s*std::string\*\s+ciphertext\)', lambda s:encrypt)
+        self.str=body_replace(self.str,r'bool\s+OSCryptImpl::DecryptString\s*\(const\s+std::string&\s+ciphertext,\s*std::string\*\s+plaintext\)', lambda s:decrypt)

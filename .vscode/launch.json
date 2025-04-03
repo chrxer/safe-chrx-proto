@@ -2,5 +2,14 @@
   "type": "python",
   "request": "launch",
   "program": "${file}",
-  "console": "integratedTerminal"
+  "console": "integratedTerminal",
+  "configurations": [
+    {
+      "name": "patch",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/patch.py",
+      "subProcess": false
+  },
+  ]
 }

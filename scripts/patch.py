@@ -1,10 +1,10 @@
 #!scripts/.venv/bin/python3
 
-from utils import SRC, git_, gclient_, PATCH, WRK
-from utils.wrap import exc
+from utils import SRC, gclient_, PATCH, WRK
+from diff import diff
+from ptcx import patch as ptcxpatch
 import shutil
 from pathlib import Path
-from os.path import relpath
 from clean import clean
 
 def _logpath(path, names):
@@ -23,14 +23,11 @@ def _logpath(path, names):
 def cpr(src, dst):
     shutil.copytree(src, dst, dirs_exist_ok=True, ignore=_logpath)
 
-def patch(_clean=True):
-    if _clean:
-        clean()
-        
+def patch():
+    clean()
     gclient_.sync()
-    cpr(PATCH.joinpath("chromium"), WRK.joinpath("chromium"))
-    # cpr(SRC.joinpasth("tools/vscode/"), SRC.joinpath(".vscode"))
-    exc("git","apply","--reject", str(WRK.joinpath("os_crypt.patch")), cwd=SRC,_pidx=3)
+    ptcxpatch.path(srcroot=SRC, patchroot=PATCH.joinpath("chromium/src"))
+    diff()
 
 
 if __name__ == "__main__":

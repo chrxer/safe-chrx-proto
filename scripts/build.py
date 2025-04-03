@@ -1,6 +1,6 @@
 #!scripts/.venv/bin/python3
 
-from utils import ccache_, DEPOT_TOOLS, OUT, SRC, mkargs
+from utils import ccache_, DEPOT_TOOLS, OUT, SRC, mkargs, GOOGLEPYTHON, GOOGLEENV
 from utils.wrap import pyexc
 from pack import pack_build
 
@@ -23,7 +23,7 @@ def gn(outdir:str,target:str="chrome",debug:bool=False):
     gnargs = [str(DEPOT_TOOLS.joinpath("gn.py")), "gen", outdir, f"--args={pargs}"]
     if root_target is not None:
         gnargs.append(f"--root-target={root_target}")
-    pyexc(*gnargs, cwd=SRC)
+    pyexc(*gnargs, cwd=SRC, python=GOOGLEPYTHON, env=GOOGLEENV)
 
 
 def build(target:str="chrome",debug:bool=False):
@@ -38,7 +38,7 @@ def build(target:str="chrome",debug:bool=False):
     
     ccache_.show()
     ccache_.z()
-    pyexc(str(DEPOT_TOOLS.joinpath("autoninja.py")), "-C", OUTR, target, cwd=SRC)
+    pyexc(str(DEPOT_TOOLS.joinpath("autoninja.py")), "-C", OUTR, target, cwd=SRC, python=GOOGLEPYTHON, env=GOOGLEENV)
 
     stamp = datetime.datetime.now().strftime("%m-%d %H:%M:%S")
     print(f"\033[94m[MOD {stamp}]\033[0m Building finished")

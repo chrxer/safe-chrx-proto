@@ -1,4 +1,10 @@
 tree-sitter
+tree-sitter-cpp
 requests
 types-requests
-httplib2
+
+orjson
+pyjson5
+
+sourcetypes3
+ptcx>=0.0.6

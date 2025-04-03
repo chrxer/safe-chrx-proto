@@ -5,7 +5,7 @@ import sys
 sys.path.insert(0,str(Path(__file__).parent.parent))
 
 from os import PathLike
-from utils.initenv import IS_LINUX, SRC, VERSION
+from utils.initenv import IS_LINUX, SRC, VERSION, GOOGLEENV
 from utils.wrap import exc
 from utils.fetch_ import fetch
 
@@ -21,8 +21,8 @@ def peek(_iter:Iterable):
 
 def fcount(cwd:PathLike=SRC) -> int:
     if not IS_LINUX:
-        raise NotImplemented("Only implemented for linux yet")
-    count = int(exc("bash","-c","git ls-files | wc -l", dbg=False, cwd=cwd))
+        raise NotImplementedError("Only implemented for linux yet")
+    count = int(exc("bash","-c","git ls-files | wc -l", dbg=False, cwd=cwd), env=GOOGLEENV)
 
     pcwd = Path(cwd)
     if count == 0 and pcwd.is_dir():
@@ -32,11 +32,11 @@ def fcount(cwd:PathLike=SRC) -> int:
     return count
 
 def reset(cwd=SRC):
-    exc("git", "clean", "-d", "--force", cwd=cwd)
-    exc("git","reset", "--hard", "--recurse-submodules", cwd=cwd)
+    exc("git", "clean", "-d", "--force", cwd=cwd,env=GOOGLEENV)
+    exc("git","reset", "--hard", "--recurse-submodules", cwd=cwd,env=GOOGLEENV)
 
 def sub_update(cwd=SRC):
-    exc("git", "submodule", "update","--recursive", "--remote")
+    exc("git", "submodule", "update","--recursive", "--remote", cwd=cwd,env=GOOGLEENV)
 
 def get_commit_from_tag(tag:str=VERSION):
     url=f"https://chromium.googlesource.com/chromium/src.git/+/{tag}?format=JSON"

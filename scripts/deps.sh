@@ -43,12 +43,15 @@ asu() {
 }
 
 nsu python3 -m venv scripts/.venv
-PYTHON=$WRK/scripts/.venv/bin/python
+nsu python3 -m venv scripts/.googlevenv
+
+PYTHON=$WRK/scripts/.venv/bin/python3
+GOOGLEPYTHON=$WRK/scripts/.googlevenv/bin/python3
+
 nsu $PYTHON -m pip install --upgrade pip
 nsu $PYTHON -m pip install -r $WRK/scripts/requirements.txt
-nsu $PYTHON -m pip uninstall -y pyjson5
-nsu pip install --break-system-packages --upgrade pip
-nsu python3 -m pip uninstall -y --break-system-packages pyjson5
+nsu $GOOGLEPYTHON -m pip install httplib2
+nsu $GOOGLEPYTHON -m pip uninstall -y pyjson5
 
 
 VERSION=$(cat "$WRK/chromium.version")

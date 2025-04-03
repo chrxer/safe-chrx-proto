@@ -1,0 +1,14 @@
+from ptcx import BasePTC
+
+from sourcetypes import md
+
+add:md = """
+```bash
+git diff --diff-filter=MD  > ../../os_crypt.patch
+```
+
+"""
+
+class PTC(BasePTC):
+    def patch(self):
+        self.str = add+self.str

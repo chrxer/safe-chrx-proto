@@ -1,0 +1,27 @@
+from ptcx import BasePTC
+import re
+from typing import Callable
+
+def search_and_insert(text:str, pattern:str, insert_func:Callable[[str], str]):
+    """
+    finds match & replaces inserts string at
+    """
+    match = re.search(pattern, text, flags=re.MULTILINE)
+
+    if not match:
+        raise ValueError(f"Pattern '{pattern}' not found in the text.")
+
+    start, end = match.span(1)
+    matched_text = text[start:end]
+    modified_text = insert_func(matched_text)
+    updated_text = text[:start] + modified_text + text[end:]
+
+    return updated_text
+
+def comment(matched_text):
+    return '# ' + matched_text + " # commented by chrx"
+
+
+class PTC(BasePTC):
+    def patch(self):
+        self.str = search_and_insert(self.str, r'^\s*(testonly\s*=\s*true)', comment)

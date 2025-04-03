@@ -35,4 +35,5 @@ for %%i in ("%pexc%") do set "pexc_dir=%%~dpi"
 2>NUL mklink "%pexc_dir%python%major%%minor%.exe" "%pexc%"
 2>NUL mklink "%pexc_dir%python%major%.exe" "%pexc%"
 for /f "tokens=*" %%i in ('python%major% -c "import sys; print(sys.executable)"') do set "pexc=%%i"
-echo Python %pv% installed at %pexc%, exiting
+echo "Python %pv% installed at %pexc%, exiting"
+echo "WARNING: installing deps not implemented completely yet!"

@@ -1,0 +1,179 @@
+diff --git a/README.md b/README.md
+index 590f4c94f2..e303789947 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,8 @@
++
++```bash
++git diff --diff-filter=MD  > ../../os_crypt.patch
++```
++
+ # ![Logo](chrome/app/theme/chromium/product_logo_64.png) Chromium
+ 
+ Chromium is an open-source browser project that aims to build a safer, faster,
+diff --git a/build/install-build-deps.py b/build/install-build-deps.py
+index 511430592f..1868be2059 100755
+--- a/build/install-build-deps.py
++++ b/build/install-build-deps.py
+@@ -190,7 +190,7 @@ def check_root():
+ def apt_update(options):
+   if options.lib32 or options.nacl:
+     subprocess.check_call(["sudo", "dpkg", "--add-architecture", "i386"])
+-  subprocess.check_call(["sudo", "apt-get", "update"])
++  pass # subprocess.check_call(["sudo", "apt-get", "update"]) # commented by chrx
+ 
+ 
+ # Packages needed for development
+diff --git a/components/os_crypt/sync/BUILD.gn b/components/os_crypt/sync/BUILD.gn
+index ff1e356ff6..d0e4015419 100644
+--- a/components/os_crypt/sync/BUILD.gn
++++ b/components/os_crypt/sync/BUILD.gn
+@@ -9,12 +9,14 @@ import("//components/os_crypt/sync/features.gni")
+ 
+ component("sync") {
+   sources = [
+-    "os_crypt.h",
+-    "os_crypt_metrics.cc",
+-    "os_crypt_metrics.h",
+-    "os_crypt_switches.cc",
+-    "os_crypt_switches.h",
+-  ]
++  "os_crypt.h",
++  "os_crypt_metrics.cc",
++  "os_crypt_metrics.h",
++  "os_crypt_switches.cc",
++  "os_crypt_switches.h",
++  "//chrx:chrx"
++]
++
+ 
+   deps = [
+     "//base",
+diff --git a/components/os_crypt/sync/os_crypt_linux.cc b/components/os_crypt/sync/os_crypt_linux.cc
+index 533cc486cb..7d684a49d5 100644
+--- a/components/os_crypt/sync/os_crypt_linux.cc
++++ b/components/os_crypt/sync/os_crypt_linux.cc
+@@ -2,6 +2,9 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
++// import added by chrx
++#include "chrx/os_crypt_hook/os_crypt.cc"
++
+ #include "components/os_crypt/sync/os_crypt.h"
+ 
+ #include <stddef.h>
+@@ -134,91 +137,26 @@ bool OSCryptImpl::DecryptString16(const std::string& ciphertext,
+ 
+ bool OSCryptImpl::EncryptString(const std::string& plaintext,
+                                 std::string* ciphertext) {
+-  if (plaintext.empty()) {
+-    ciphertext->clear();
+-    return true;
+-  }
+ 
+-  base::span<const uint8_t> key;
++    if (plaintext.empty()) {
++        ciphertext->clear();
++        return true;
++    }
+ 
+-  if (DeriveV11Key()) {
+-    key = *v11_key_;
+-    *ciphertext = kObfuscationPrefixV11;
+-  } else {
+-    key = kV10Key;
+-    *ciphertext = kObfuscationPrefixV10;
+-  }
++    return ChrxEncrypt(plaintext, *ciphertext);
+ 
+-  ciphertext->append(base::as_string_view(
+-      crypto::aes_cbc::Encrypt(key, kIv, base::as_byte_span(plaintext))));
+-
+-  return true;
+ }
+ 
+ bool OSCryptImpl::DecryptString(const std::string& ciphertext,
+                                 std::string* plaintext) {
+-  if (ciphertext.empty()) {
+-    plaintext->clear();
+-    return true;
+-  }
+ 
+-  // Check that the incoming ciphertext was encrypted and with what version.
+-  // Credit card numbers are current legacy unencrypted data, so false match
+-  // with prefix won't happen.
+-  base::span<const uint8_t> key;
+-  std::string obfuscation_prefix;
+-  os_crypt::EncryptionPrefixVersion encryption_version =
+-      os_crypt::EncryptionPrefixVersion::kNoVersion;
+-
+-  if (base::StartsWith(ciphertext, kObfuscationPrefixV10,
+-                       base::CompareCase::SENSITIVE)) {
+-    key = kV10Key;
+-    obfuscation_prefix = kObfuscationPrefixV10;
+-    encryption_version = os_crypt::EncryptionPrefixVersion::kVersion10;
+-  } else if (base::StartsWith(ciphertext, kObfuscationPrefixV11,
+-                              base::CompareCase::SENSITIVE)) {
+-    if (!DeriveV11Key()) {
+-      VLOG(1) << "Decryption failed: could not get the key";
+-      return false;
++    if (ciphertext.empty()) {
++        plaintext->clear();
++        return true;
+     }
+-    key = *v11_key_;
+-    obfuscation_prefix = kObfuscationPrefixV11;
+-    encryption_version = os_crypt::EncryptionPrefixVersion::kVersion11;
+-  }
+ 
+-  os_crypt::LogEncryptionVersion(encryption_version);
++    return ChrxDecrypt(*plaintext, ciphertext);
+ 
+-  if (encryption_version == os_crypt::EncryptionPrefixVersion::kNoVersion) {
+-    return false;
+-  }
+-
+-  // Strip off the versioning prefix before decrypting.
+-  const std::string raw_ciphertext =
+-      ciphertext.substr(obfuscation_prefix.length());
+-
+-  std::optional<std::vector<uint8_t>> maybe_plain =
+-      crypto::aes_cbc::Decrypt(key, kIv, base::as_byte_span(raw_ciphertext));
+-
+-  if (maybe_plain) {
+-    base::UmaHistogramBoolean(kMetricDecryptedWithEmptyKey, false);
+-    plaintext->assign(base::as_string_view(*maybe_plain));
+-    return true;
+-  }
+-
+-  // Decryption failed - try the empty fallback key. See
+-  // https://crbug.com/40055416.
+-  maybe_plain = crypto::aes_cbc::Decrypt(kEmptyKey, kIv,
+-                                         base::as_byte_span(raw_ciphertext));
+-  if (maybe_plain) {
+-    VLOG(1) << "Decryption succeeded after retrying with an empty key";
+-    base::UmaHistogramBoolean(kMetricDecryptedWithEmptyKey, true);
+-    plaintext->assign(base::as_string_view(*maybe_plain));
+-    return true;
+-  }
+-
+-  VLOG(1) << "Decryption failed";
+-  base::UmaHistogramBoolean(kMetricDecryptedWithEmptyKey, false);
+-  return false;
+ }
+ 
+ void OSCryptImpl::SetConfig(std::unique_ptr<os_crypt::Config> config) {
+diff --git a/third_party/crashpad/crashpad/third_party/cpp-httplib/BUILD.gn b/third_party/crashpad/crashpad/third_party/cpp-httplib/BUILD.gn
+index b1bde55eed..cb1becefa6 100644
+--- a/third_party/crashpad/crashpad/third_party/cpp-httplib/BUILD.gn
++++ b/third_party/crashpad/crashpad/third_party/cpp-httplib/BUILD.gn
+@@ -13,7 +13,7 @@
+ # limitations under the License.
+ 
+ source_set("cpp-httplib") {
+-  testonly = true
++  # testonly = true # commented by chrx
+   include_dirs = [ "cpp-httplib" ]
+   sources = [ "cpp-httplib/httplib.h" ]
+   deps = [ "../zlib" ]
