@@ -90,22 +90,22 @@ func main() {
 		submitButton := widget.NewButton("OK", func() {
 			pswd := entry.Text
 			if len(pswd) < 8 {
-				errorLabel = canvas.NewText("Password is too short", color.RGBA{R: 255, G: 128, B: 128, A: 255})
+				errorLabel.Text = "Password is too short"
 			} else if len(pswd) > 32 {
-				errorLabel = canvas.NewText("Password is too long", color.RGBA{R: 255, G: 128, B: 128, A: 255})
+				errorLabel.Text = "Password is too long"
 			} else { 
 				if isValid(pswd) {
 					userPassword = pswd;
 					myWindow.Hide()
 					wg.Done()
+					return
 				} else {
-					errorLabel = canvas.NewText("Invalid password", color.RGBA{R: 255, G: 128, B: 128, A: 255})
+					errorLabel.Text = "Invalid password"
 				}
 			}
-			// Refresh canvas.text somehow?? -> errorLabel.Refresh() nor content.Refresh() work.
+			errorLabel.Color = color.RGBA{R: 255, G: 80, B: 80, A: 255}
+			errorLabel.Refresh()
 		})
-
-		entry.Resize(fyne.NewSize(100, 0))
 		
 		content := container.NewPadded(container.NewBorder(errorLabel, nil, nil, nil, container.NewBorder(nil, nil, nil, submitButton, entry)))
 
@@ -125,8 +125,6 @@ func main() {
 
 func isValid(pswd string) bool {
     // -> Golang Argon2
-	if len(pswd) == 0 {
-		return false
-	}
+	// Also: Fetch/Read hash.txt file (and write if there is no hash yet)
 	return true
 }

@@ -86,10 +86,9 @@ func getMasterPassword() []byte {
 		for(len(userPassword) == 0) {
 			wg.Add(1)
 			go func() {
-				// dialogBox.Show() // Otherwise the dialogbox is hidden upon closing window
 				myWindow.Show()
 			}()
-			wg.Wait()
+			wg.Wait() // wg.Done() is run when the correct password is given by the user on Main()
 		}
 		masterKey = NewSHA256([]byte(userPassword))
 	}
