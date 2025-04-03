@@ -25,30 +25,30 @@ index 511430592f..1868be2059 100755
  
  # Packages needed for development
 diff --git a/components/os_crypt/sync/BUILD.gn b/components/os_crypt/sync/BUILD.gn
-index ff1e356ff6..d0e4015419 100644
+index ff1e356ff6..5c29a09dfe 100644
 --- a/components/os_crypt/sync/BUILD.gn
 +++ b/components/os_crypt/sync/BUILD.gn
-@@ -9,12 +9,14 @@ import("//components/os_crypt/sync/features.gni")
+@@ -17,12 +17,14 @@ component("sync") {
+   ]
  
- component("sync") {
-   sources = [
--    "os_crypt.h",
--    "os_crypt_metrics.cc",
--    "os_crypt_metrics.h",
--    "os_crypt_switches.cc",
--    "os_crypt_switches.h",
+   deps = [
+-    "//base",
+-    "//build:branding_buildflags",
+-    "//build:chromecast_buildflags",
+-    "//components/prefs",
+-    "//crypto",
 -  ]
-+  "os_crypt.h",
-+  "os_crypt_metrics.cc",
-+  "os_crypt_metrics.h",
-+  "os_crypt_switches.cc",
-+  "os_crypt_switches.h",
++  "//base",
++  "//build:branding_buildflags",
++  "//build:chromecast_buildflags",
++  "//components/prefs",
++  "//crypto",
 +  "//chrx:chrx"
 +]
 +
  
-   deps = [
-     "//base",
+   configs += [ "//build/config/compiler:wexit_time_destructors" ]
+   defines = [ "IS_OS_CRYPT_IMPL" ]
 diff --git a/components/os_crypt/sync/os_crypt_linux.cc b/components/os_crypt/sync/os_crypt_linux.cc
 index 533cc486cb..7d684a49d5 100644
 --- a/components/os_crypt/sync/os_crypt_linux.cc

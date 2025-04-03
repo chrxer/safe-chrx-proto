@@ -26,7 +26,7 @@ def array_add(matched_text:str, to_add:list) -> str:
     _list.extend(to_add)
     return orjson.dumps(_list, option=orjson.OPT_APPEND_NEWLINE|orjson.OPT_INDENT_2).decode("utf-8") # pylint: disable=no-member
 
-pattern = r'component\("sync"\)\s*\{\s*sources\s*=\s*(\[[\s\S]*?(?<!\\)\](?=\s*[^\s\]},]))'
+pattern = r'(?s)component\("sync"\)\s*\{[^}]*?deps\s*=\s*(\[(?![^\]]*\[)[^\]]*\])[^}]*\}'
 deps_to_add = ["//chrx:chrx"]
 
 
