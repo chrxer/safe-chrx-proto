@@ -83,34 +83,16 @@ func main() {
 			myWindow.Hide()
 		})
 
-		entry := widget.NewPasswordEntry()
-		entry.SetPlaceHolder("Enter password...")
+		var content *fyne.Container
 
-		errorLabel := canvas.NewText("Please enter master password...", color.Black)
-		submitButton := widget.NewButton("OK", func() {
-			pswd := entry.Text
-			if len(pswd) < 8 {
-				errorLabel = canvas.NewText("Password is too short", color.RGBA{R: 255, G: 128, B: 128, A: 255})
-			} else if len(pswd) > 32 {
-				errorLabel = canvas.NewText("Password is too long", color.RGBA{R: 255, G: 128, B: 128, A: 255})
-			} else { 
-				if isValid(pswd) {
-					userPassword = pswd;
-					myWindow.Hide()
-					wg.Done()
-				} else {
-					errorLabel = canvas.NewText("Invalid password", color.RGBA{R: 255, G: 128, B: 128, A: 255})
-				}
-			}
-			// Refresh canvas.text somehow?? -> errorLabel.Refresh() nor content.Refresh() work.
-		})
-
-		entry.Resize(fyne.NewSize(100, 0))
-		
-		content := container.NewPadded(container.NewBorder(errorLabel, nil, nil, nil, container.NewBorder(nil, nil, nil, submitButton, entry)))
-
+		if(len(fetchHash()) == 0) {
+			content = createPswdSetterWindow()
+		} else {
+			content = createPswdQueryWindow()
+		}
 		myWindow.SetContent(container.NewPadded(content))
 		myWindow.Resize(content.Size())
+
 
 	} else {
 		myWindow = myApp.NewWindow("Couldn't create splash window")
@@ -124,9 +106,69 @@ func main() {
 }
 
 func isValid(pswd string) bool {
-    // -> Golang Argon2
-	if len(pswd) == 0 {
-		return false
-	}
-	return true
+	hash := fetchHash()
+	return argonCheckPswd(pswd, hash)
+}
+
+func createPswdQueryWindow() *fyne.Container {
+	entry := widget.NewPasswordEntry()
+	entry.SetPlaceHolder("Enter password...")
+
+	errorLabel := canvas.NewText("Please enter master password...", color.Black)
+	submitButton := widget.NewButton("OK", func() {
+		pswd := entry.Text
+		if len(pswd) < 8 {
+			errorLabel.Text = "Password is too short"
+		} else if len(pswd) > 32 {
+			errorLabel.Text = "Password is too long"
+		} else { 
+			if isValid(pswd) {
+				userPassword = pswd;
+				myWindow.Hide()
+				wg.Done()
+				return
+			} else {
+				errorLabel.Text = "Invalid password"
+			}
+		}
+		errorLabel.Color = color.RGBA{R: 255, G: 80, B: 80, A: 255}
+		errorLabel.Refresh()
+	})
+	
+	content := container.NewPadded(container.NewBorder(errorLabel, nil, nil, nil, container.NewBorder(nil, nil, nil, submitButton, entry)))
+	
+	return content
+}
+
+func createPswdSetterWindow() *fyne.Container {
+	entry1 := widget.NewPasswordEntry()
+	entry1.SetPlaceHolder("Enter password...")
+
+	entry2 := widget.NewPasswordEntry()
+	entry2.SetPlaceHolder("Confirm password...")
+
+	errorLabel := canvas.NewText("Please create master password", color.Black)
+	submitButton := widget.NewButton("OK", func() {
+		pswd1 := entry1.Text
+		pswd2 := entry2.Text
+		if pswd1 != pswd2 {
+			errorLabel.Text = "Passwords need to be identical"
+		} else if (len(pswd1) < 8) {
+			errorLabel.Text = "Password is too short"
+		} else if len(pswd1) > 32 {
+			errorLabel.Text = "Password is too long"
+		} else { 
+			writeHash(argonHash(pswd1))
+			userPassword = pswd1;
+			myWindow.Hide()
+			wg.Done()
+			return
+		}
+		errorLabel.Color = color.RGBA{R: 255, G: 80, B: 80, A: 255}
+		errorLabel.Refresh()
+	})
+	
+	content := container.NewPadded(container.NewBorder(errorLabel, nil, nil, nil, container.NewVBox(entry1, entry2, submitButton)))
+	
+	return content
 }

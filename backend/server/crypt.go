@@ -7,6 +7,9 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
+	"os"
+
+	"github.com/alexedwards/argon2id"
 )
 
 // import () if necessary
@@ -86,10 +89,9 @@ func getMasterPassword() []byte {
 		for(len(userPassword) == 0) {
 			wg.Add(1)
 			go func() {
-				// dialogBox.Show() // Otherwise the dialogbox is hidden upon closing window
 				myWindow.Show()
 			}()
-			wg.Wait()
+			wg.Wait() // wg.Done() is run when the correct password is given by the user on Main()
 		}
 		masterKey = NewSHA256([]byte(userPassword))
 	}
@@ -99,4 +101,39 @@ func getMasterPassword() []byte {
 func NewSHA256(data []byte) []byte {
 	hash := sha256.Sum256(data)
 	return hash[:]
+}
+
+func argonHash(pswd string) string {
+	hash, err := argon2id.CreateHash(pswd, argon2id.DefaultParams)
+	if err != nil {
+		fmt.Printf("%s", err.Error())
+	}
+
+	return hash
+}
+
+func argonCheckPswd(pswd string, hash string) bool {
+	match, err := argon2id.ComparePasswordAndHash(pswd, hash)
+	if err != nil {
+		fmt.Printf("%s", err.Error())
+	}
+	return match
+}
+
+
+func fetchHash() string {
+	dat, err := os.ReadFile("./password.txt")
+	if err != nil {
+        panic(err)
+    }
+    return string(dat)
+}
+
+func writeHash(hash string) {
+	data := []byte(hash)
+    err := os.WriteFile("./password.txt", data, 0666)
+    if err != nil {
+        fmt.Printf("%s", err.Error())
+    }
+    fmt.Println("file written successfully.")
 }
