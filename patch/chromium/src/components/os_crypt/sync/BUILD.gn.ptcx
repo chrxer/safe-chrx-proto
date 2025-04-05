@@ -1,35 +1,10 @@
 from ptcx import BasePTC
-import re
-from typing import Callable
-import pyjson5
-import orjson
+from ptcx.utils.langs import array_add
 
-def search_and_insert(text:str, pattern:str, insert_func:Callable[[str], str]):
-    """
-    finds match & replaces inserts string at
-    """
-    match = re.search(pattern, text, flags=re.MULTILINE)
-
-    if not match:
-        raise ValueError(f"Pattern '{pattern}' not found in the text.")
-
-    start, end = match.span(1)
-    matched_text = text[start:end]
-    modified_text = insert_func(matched_text)
-    updated_text = text[:start] + modified_text + text[end:]
-
-    return updated_text
-
-def array_add(matched_text:str, to_add:list) -> str:
-    _list = pyjson5.decode(matched_text) # pylint: disable=no-member
-    assert isinstance(_list, list)
-    _list.extend(to_add)
-    return orjson.dumps(_list, option=orjson.OPT_APPEND_NEWLINE|orjson.OPT_INDENT_2).decode("utf-8") # pylint: disable=no-member
-
-pattern = r'(?s)component\("sync"\)\s*\{[^}]*?deps\s*=\s*(\[(?![^\]]*\[)[^\]]*\])[^}]*\}'
-deps_to_add = ["//chrx:chrx"]
-
+pattern = rb'(?s)component\("sync"\)\s*\{[^}]*?deps\s*=\s*(\[(?![^\]]*\[)[^\]]*\])[^}]*\}'
+deps_to_add = [b"//chrx:chrx"]
 
 class PTC(BasePTC):
     def patch(self):
-        self.str = search_and_insert(self.str, pattern, lambda s:array_add(s, deps_to_add))
+        self.insert(pattern, lambda s:array_add(s, deps_to_add))
+        print("")

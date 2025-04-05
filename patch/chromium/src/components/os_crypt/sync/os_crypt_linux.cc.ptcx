@@ -1,42 +1,20 @@
 from ptcx import BasePTC
 import re
-from typing import Callable
-from sourcetypes import cpp
+from typing import Callable, Union
 
-from tree_sitter import Parser, Language
-import tree_sitter_cpp
+from sourcetypes import cc
+from tree_sitter import Node
 
-parser = Parser(Language(tree_sitter_cpp.language()))
-
-
-def search_and_insert(text:str, pattern:str, insert_func:Callable[[str], str]):
-    """
-    finds match & replaces inserts string at
-    """
-    match = re.search(pattern, text, flags=re.MULTILINE)
-
-    if not match:
-        raise ValueError(f"Pattern '{pattern}' not found in the text.")
-
-    start, end = match.span(1)
-    matched_text = text[start:end]
-    modified_text = insert_func(matched_text)
-    updated_text = text[:start] + modified_text + text[end:]
-
-    return updated_text
-
-firstcomment = r'^(\s*(?://.*\n|/\*[^*]*\*+(?:[^/*][^*]*\*+)*/\s*\n?)+\s*)\n|^'
-add:cpp = """
+firstcomment = rb'^(\s*(?://.*\n|/\*[^*]*\*+(?:[^/*][^*]*\*+)*/\s*\n?)+\s*)\n|^'
+add:cc = b"""
 // import added by chrx
 #include "chrx/os_crypt_hook/os_crypt.cc"
 """
 
-fnbody=r'\s*\{(?>[^{}]+|(?R))*\}'
-
-def body_replace(text: str, signature: str, insert_func: Callable[[str], str]) -> str:
-    tree = parser.parse(bytes(text, "utf8"))
-    root_node = tree.root_node
-    pattern = re.compile(signature+r'\s+\{')
+def body_replace(text: bytes,root_node:Node, signature: Union[str, bytes], insert_func: Callable[[bytes], str]) -> str:
+    if isinstance(signature, str):
+        signature = signature.encode("utf-8")
+    pattern = re.compile(signature+rb'\s+\{')
     
     for child in root_node.children:
         if child.type == "function_definition":
@@ -48,11 +26,13 @@ def body_replace(text: str, signature: str, insert_func: Callable[[str], str]) -
                         start, end = subchild.start_byte, subchild.end_byte
                         matched_text = text[start:end]
                         modified_text = insert_func(matched_text)
-                        updated_text = text[:start] + "{\n" + modified_text + "\n}" + text[end:]
+                        if isinstance(modified_text, str):
+                            modified_text = str.encode("utf-8")
+                        updated_text = text[:start] + b"{\n" + modified_text + b"\n}" + text[end:]
                         return updated_text
     raise ValueError(f"Couldn't find signature:{signature}")
     
-encrypt:cpp=  """
+encrypt:cc=b"""
     if (plaintext.empty()) {
         ciphertext->clear();
         return true;
@@ -61,7 +41,7 @@ encrypt:cpp=  """
     return ChrxEncrypt(plaintext, *ciphertext);
 """
 
-decrypt:cpp="""
+decrypt:cc=b"""
     if (ciphertext.empty()) {
         plaintext->clear();
         return true;
@@ -72,6 +52,6 @@ decrypt:cpp="""
 
 class PTC(BasePTC):
     def patch(self):
-        self.str = search_and_insert(self.str, firstcomment, lambda s:s+add)
-        self.str=body_replace(self.str,r'bool\s+OSCryptImpl::EncryptString\s*\(const\s+std::string&\s+plaintext,\s*std::string\*\s+ciphertext\)', lambda s:encrypt)
-        self.str=body_replace(self.str,r'bool\s+OSCryptImpl::DecryptString\s*\(const\s+std::string&\s+ciphertext,\s*std::string\*\s+plaintext\)', lambda s:decrypt)
+        self.insert(firstcomment, lambda s:s+add)
+        self.bytes=body_replace(self.bytes,self.tree.root_node,rb'bool\s+OSCryptImpl::EncryptString\s*\(const\s+std::string&\s+plaintext,\s*std::string\*\s+ciphertext\)', lambda s:encrypt)
+        self.bytes=body_replace(self.bytes,self.tree.root_node,rb'bool\s+OSCryptImpl::DecryptString\s*\(const\s+std::string&\s+ciphertext,\s*std::string\*\s+plaintext\)', lambda s:decrypt)

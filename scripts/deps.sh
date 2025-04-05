@@ -50,11 +50,25 @@ GOOGLEPYTHON=$WRK/scripts/.googlevenv/bin/python3
 
 nsu $PYTHON -m pip install --upgrade pip
 nsu $PYTHON -m pip install -r $WRK/scripts/requirements.txt
+
+# install local built ptcx if available
+# PTCX=$(dirname "$WRK")/ptcx
+if [ -d "$PTCX" ]; then
+  echo "Installing ptcx from local dev directory"
+  nsu $PYTHON -m pip uninstall -y ptcx
+  nsu rm -rf $PTCX/dist
+  CURR=$PWD
+  cd $PTCX
+  nsu $PTCX/.venv/bin/python3 -m build
+  cd "$CURR"
+  nsu $PYTHON -m pip install $PTCX/dist/ptcx*.tar.gz
+fi
+
 nsu $GOOGLEPYTHON -m pip install httplib2
 nsu $GOOGLEPYTHON -m pip uninstall -y pyjson5
 
 
-VERSION=$(cat "$WRK/chromium.version")
+VERSION=$(cat "$WRK/chromium.version")/ptcx
 COMMIT=$(sudo -u "$USER" env "PATH=$PATH" "$WRK/scripts/utils/git_.py")
 echo $COMMIT
 
