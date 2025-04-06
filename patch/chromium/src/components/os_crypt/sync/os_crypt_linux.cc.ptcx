@@ -23,6 +23,7 @@ CppFnSignQuery:trs = b"""
       [
         declarator:(qualified_identifier) @name
         declarator:(identifier) @name
+        declarator:(field_identifier) @name
       ]
       parameters: (parameter_list ;; parameters
         (parameter_declaration
@@ -53,6 +54,7 @@ CppFnSignQuery:trs = b"""
       [
         declarator:(qualified_identifier) @name
         declarator:(identifier) @name
+        declarator:(field_identifier) @name
       ]
       parameters: (parameter_list ;; parameters
         (parameter_declaration
