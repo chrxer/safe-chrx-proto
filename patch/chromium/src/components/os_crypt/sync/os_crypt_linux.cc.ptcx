@@ -27,7 +27,7 @@ CppFnSignQuery:trs = b"""
       ]
       parameters: (parameter_list ;; parameters
         (parameter_declaration
-          type:( ;; return type
+          type:(
               [
                 (primitive_type) @param_type
                 (qualified_identifier
@@ -58,7 +58,7 @@ CppFnSignQuery:trs = b"""
       ]
       parameters: (parameter_list ;; parameters
         (parameter_declaration
-          type:( ;; return type
+          type:( 
               [
                 (primitive_type) @param_type
                 (qualified_identifier
