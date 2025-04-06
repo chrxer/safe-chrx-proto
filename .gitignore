@@ -10,5 +10,7 @@ ccache.tar.gz*
 
 __pycache__
 
+docs/tsqnb
+
 !patch/chromium
 !patch/chromium/src/build
