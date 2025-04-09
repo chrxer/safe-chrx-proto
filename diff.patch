@@ -164,6 +164,170 @@ index 533cc486cb..7d684a49d5 100644
  }
  
  void OSCryptImpl::SetConfig(std::unique_ptr<os_crypt::Config> config) {
+diff --git a/components/os_crypt/sync/os_crypt_mac.mm b/components/os_crypt/sync/os_crypt_mac.mm
+index 15309ae1b3..d5edfc263a 100644
+--- a/components/os_crypt/sync/os_crypt_mac.mm
++++ b/components/os_crypt/sync/os_crypt_mac.mm
+@@ -2,6 +2,9 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
++// import added by chrx
++#include "chrx/os_crypt_hook/os_crypt.cc"
++
+ #include "components/os_crypt/sync/os_crypt.h"
+ 
+ #include <stddef.h>
+@@ -183,66 +186,26 @@ bool OSCryptImpl::DecryptString16(const std::string& ciphertext,
+ 
+ bool OSCryptImpl::EncryptString(const std::string& plaintext,
+                             std::string* ciphertext) {
+-  if (plaintext.empty()) {
+-    *ciphertext = std::string();
+-    return true;
+-  }
+ 
+-  if (!DeriveKey()) {
+-    VLOG(1) << "Key derivation failed";
+-    return false;
+-  }
++    if (plaintext.empty()) {
++        ciphertext->clear();
++        return true;
++    }
+ 
+-  // Prefix the cypher text with version information.
+-  *ciphertext = kObfuscationPrefixV10;
+-  ciphertext->append(base::as_string_view(
+-      crypto::aes_cbc::Encrypt(*key_, kIv, base::as_byte_span(plaintext))));
++    return ChrxEncrypt(plaintext, *ciphertext);
+ 
+-  return true;
+ }
+ 
+ bool OSCryptImpl::DecryptString(const std::string& ciphertext,
+                             std::string* plaintext) {
+-  if (ciphertext.empty()) {
+-    *plaintext = std::string();
+-    return true;
+-  }
+ 
+-  // Check that the incoming cyphertext was indeed encrypted with the expected
+-  // version.  If the prefix is not found then we'll assume we're dealing with
+-  // old data saved as clear text and we'll return it directly.
+-  // Credit card numbers are current legacy data, so false match with prefix
+-  // won't happen.
+-  const os_crypt::EncryptionPrefixVersion encryption_version =
+-      ciphertext.find(kObfuscationPrefixV10) == 0
+-          ? os_crypt::EncryptionPrefixVersion::kVersion10
+-          : os_crypt::EncryptionPrefixVersion::kNoVersion;
++    if (ciphertext.empty()) {
++        plaintext->clear();
++        return true;
++    }
+ 
+-  os_crypt::LogEncryptionVersion(encryption_version);
++    return ChrxDecrypt(*plaintext, ciphertext);
+ 
+-  if (encryption_version == os_crypt::EncryptionPrefixVersion::kNoVersion) {
+-    return false;
+-  }
+-
+-  if (!DeriveKey()) {
+-    VLOG(1) << "Key derivation failed";
+-    return false;
+-  }
+-
+-  // Strip off the versioning prefix before decrypting.
+-  base::span<const uint8_t> raw_ciphertext =
+-      base::as_byte_span(ciphertext).subspan(strlen(kObfuscationPrefixV10));
+-
+-  std::optional<std::vector<uint8_t>> maybe_plain =
+-      crypto::aes_cbc::Decrypt(*key_, kIv, base::as_byte_span(raw_ciphertext));
+-
+-  if (!maybe_plain) {
+-    VLOG(1) << "Decryption failed";
+-    return false;
+-  }
+-
+-  plaintext->assign(base::as_string_view(*maybe_plain));
+-  return true;
+ }
+ 
+ bool OSCryptImpl::IsEncryptionAvailable() {
+diff --git a/components/os_crypt/sync/os_crypt_win.cc b/components/os_crypt/sync/os_crypt_win.cc
+index 6cb720a5e1..e7a836b15e 100644
+--- a/components/os_crypt/sync/os_crypt_win.cc
++++ b/components/os_crypt/sync/os_crypt_win.cc
+@@ -2,6 +2,9 @@
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+ 
++// import added by chrx
++#include "chrx/os_crypt_hook/os_crypt.cc"
++
+ #include "components/os_crypt/sync/os_crypt.h"
+ 
+ #include <windows.h>
+@@ -195,48 +198,26 @@ bool OSCryptImpl::DecryptString16(const std::string& ciphertext,
+ 
+ bool OSCryptImpl::EncryptString(const std::string& plaintext,
+                             std::string* ciphertext) {
+-  if (use_legacy_)
+-    return EncryptStringWithDPAPI(plaintext, ciphertext);
+ 
+-  crypto::Aead aead(crypto::Aead::AES_256_GCM);
++    if (plaintext.empty()) {
++        ciphertext->clear();
++        return true;
++    }
+ 
+-  const auto key = GetRawEncryptionKey();
+-  aead.Init(&key);
++    return ChrxEncrypt(plaintext, *ciphertext);
+ 
+-  // Note: can only check these once AEAD is initialized.
+-  DCHECK_EQ(kKeyLength, aead.KeyLength());
+-  DCHECK_EQ(kNonceLength, aead.NonceLength());
+-
+-  std::string nonce(kNonceLength, '\0');
+-  crypto::RandBytes(base::as_writable_byte_span(nonce));
+-
+-  if (!aead.Seal(plaintext, nonce, std::string(), ciphertext))
+-    return false;
+-
+-  ciphertext->insert(0, nonce);
+-  ciphertext->insert(0, kEncryptionVersionPrefix);
+-  return true;
+ }
+ 
+ bool OSCryptImpl::DecryptString(const std::string& ciphertext,
+                             std::string* plaintext) {
+-  if (!base::StartsWith(ciphertext, kEncryptionVersionPrefix,
+-                        base::CompareCase::SENSITIVE))
+-    return DecryptStringWithDPAPI(ciphertext, plaintext);
+ 
+-  crypto::Aead aead(crypto::Aead::AES_256_GCM);
++    if (ciphertext.empty()) {
++        plaintext->clear();
++        return true;
++    }
+ 
+-  const auto key = GetRawEncryptionKey();
+-  aead.Init(&key);
++    return ChrxDecrypt(*plaintext, ciphertext);
+ 
+-  // Obtain the nonce.
+-  const std::string nonce =
+-      ciphertext.substr(sizeof(kEncryptionVersionPrefix) - 1, kNonceLength);
+-  // Strip off the versioning prefix before decrypting.
+-  const std::string raw_ciphertext =
+-      ciphertext.substr(kNonceLength + (sizeof(kEncryptionVersionPrefix) - 1));
+-
+-  return aead.Open(raw_ciphertext, nonce, std::string(), plaintext);
+ }
+ 
+ // static
 diff --git a/third_party/crashpad/crashpad/third_party/cpp-httplib/BUILD.gn b/third_party/crashpad/crashpad/third_party/cpp-httplib/BUILD.gn
 index b1bde55eed..cb1becefa6 100644
 --- a/third_party/crashpad/crashpad/third_party/cpp-httplib/BUILD.gn
