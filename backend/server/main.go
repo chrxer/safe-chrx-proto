@@ -15,19 +15,25 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+/* GLOBAL VARIABLES */
+
 var masterKey []byte
 var wg sync.WaitGroup
 var userPassword string
+
+var myApp fyne.App
+var myWindow fyne.Window
+
+/* SERVER ENDPOINT */
 
 func getRoot(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "See https://github.com/chrxer/safe-chrx-proto/tree/main/backend/server\n")
 }
 
 func handleEncrypt(w http.ResponseWriter, r *http.Request) {
-	if !testPost(w, r) {
+	if !isPost(w, r) {
 		return
 	}
-	fmt.Printf("Encrypting..\n")
 	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		fmt.Printf("%s", err.Error())
@@ -36,10 +42,9 @@ func handleEncrypt(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDecrypt(w http.ResponseWriter, r *http.Request) {
-	if !testPost(w, r) {
+	if !isPost(w, r) {
 		return
 	}
-	fmt.Printf("Decrypting..\n")
 	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		fmt.Printf("%s", err.Error())
@@ -47,7 +52,7 @@ func handleDecrypt(w http.ResponseWriter, r *http.Request) {
 	w.Write(decrypt(reqBody))
 }
 
-func testPost(w http.ResponseWriter, r *http.Request) bool {
+func isPost(w http.ResponseWriter, r *http.Request) bool {
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(""))
@@ -56,35 +61,35 @@ func testPost(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-var myApp fyne.App
-var myWindow fyne.Window
-
 func serve() {
 		http.HandleFunc("/", getRoot)
 		http.HandleFunc("/encrypt", handleEncrypt)
 		http.HandleFunc("/decrypt", handleDecrypt)
 		err := http.ListenAndServe("localhost:3333", nil)
 		if err != nil {
-			fmt.Printf("Server error")
+			fmt.Println("Server error: ", err)
 			// Handle the error appropriately
 		}
 	}
 
+/* MAIN */
+
 func main() {
 	myApp = app.New()
-	// var myWindow fyne.Window
 	drv := myApp.Driver()
 
 	if drv, ok := drv.(desktop.Driver); ok {
 		myWindow = drv.CreateSplashWindow()
 
+		// Hide instead of close -> Closing stops the entire program
 		myWindow.SetCloseIntercept(func() {
-			wg.Done()
+			wg.Done() // See getMasterPassword() in crypt.go
 			myWindow.Hide()
 		})
 
 		var content *fyne.Container
 
+		// Is there already a master password set?
 		if(len(fetchHash()) == 0) {
 			content = createPswdSetterWindow()
 		} else {
@@ -92,17 +97,14 @@ func main() {
 		}
 		myWindow.SetContent(container.NewPadded(content))
 		myWindow.Resize(content.Size())
-
-
 	} else {
-		myWindow = myApp.NewWindow("Couldn't create splash window")
+		fmt.Println("Failed to create splash window")
 	}
 
 	go serve()
+
 	myWindow.Hide()
-	myWindow.SetMaster()
-	myApp.Run()
-	fmt.Println("App closing..")
+	myApp.Run() // Due to being hidden it runs in the background
 }
 
 func isValid(pswd string) bool {
@@ -111,9 +113,11 @@ func isValid(pswd string) bool {
 }
 
 func createPswdQueryWindow() *fyne.Container {
+	// entry = input box
 	entry := widget.NewPasswordEntry()
 	entry.SetPlaceHolder("Enter password...")
 
+	// errorLabel will be used to display errors (in red text)
 	errorLabel := canvas.NewText("Please enter master password...", color.Black)
 	submitButton := widget.NewButton("OK", func() {
 		pswd := entry.Text
@@ -125,28 +129,32 @@ func createPswdQueryWindow() *fyne.Container {
 			if isValid(pswd) {
 				userPassword = pswd;
 				myWindow.Hide()
-				wg.Done()
+				wg.Done() // See getMasterPassword() in crypt.go
 				return
 			} else {
 				errorLabel.Text = "Invalid password"
 			}
 		}
+		// Set error color (red)
 		errorLabel.Color = color.RGBA{R: 255, G: 80, B: 80, A: 255}
 		errorLabel.Refresh()
 	})
 	
+	// Creates padded container (horizontal -> Entry + button) within a container (vertical -> Error label + previous container)
 	content := container.NewPadded(container.NewBorder(errorLabel, nil, nil, nil, container.NewBorder(nil, nil, nil, submitButton, entry)))
 	
 	return content
 }
 
 func createPswdSetterWindow() *fyne.Container {
+	// Entry = input box
 	entry1 := widget.NewPasswordEntry()
 	entry1.SetPlaceHolder("Enter password...")
 
 	entry2 := widget.NewPasswordEntry()
 	entry2.SetPlaceHolder("Confirm password...")
 
+	// errorLabel will be used to display errors (in red text)
 	errorLabel := canvas.NewText("Please create master password", color.Black)
 	submitButton := widget.NewButton("OK", func() {
 		pswd1 := entry1.Text
@@ -161,13 +169,15 @@ func createPswdSetterWindow() *fyne.Container {
 			writeHash(argonHash(pswd1))
 			userPassword = pswd1;
 			myWindow.Hide()
-			wg.Done()
+			wg.Done() // See getMasterPassword() in crypt.go
 			return
 		}
+		// Set error color (red)
 		errorLabel.Color = color.RGBA{R: 255, G: 80, B: 80, A: 255}
 		errorLabel.Refresh()
 	})
-	
+
+	// Creates padded container (vertical -> Entry + entry + button) within a container (vertical -> Error label + previous container)
 	content := container.NewPadded(container.NewBorder(errorLabel, nil, nil, nil, container.NewVBox(entry1, entry2, submitButton)))
 	
 	return content
