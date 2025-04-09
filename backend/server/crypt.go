@@ -8,8 +8,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/alexedwards/argon2id"
+	"github.com/emersion/go-appdir"
 )
 
 func encrypt(b []byte) []byte {
@@ -113,8 +115,23 @@ func argonCheckPswd(pswd string, hash string) bool {
 
 /* FILE (password) read & write */
 
+func getHashFile() string {
+    dirs := appdir.New("chrx-safe-proto")
+	p := dirs.UserConfig()
+	if err := os.MkdirAll(p, 0666); err != nil {
+		panic(err)
+	}
+	f, err := os.Create(filepath.Join(p, "argon2.hash"))
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	return p
+}
+
 func fetchHash() string {
-	dat, err := os.ReadFile("./password.txt")
+	
+	dat, err := os.ReadFile(getHashFile())
 	if err != nil {
         panic(err)
     }
@@ -123,7 +140,7 @@ func fetchHash() string {
 
 func writeHash(hash string) {
 	data := []byte(hash)
-    err := os.WriteFile("./password.txt", data, 0666)
+    err := os.WriteFile(getHashFile(), data, 0666)
     if err != nil {
         fmt.Printf("%s", err.Error())
     }
