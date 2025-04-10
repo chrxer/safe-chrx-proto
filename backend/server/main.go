@@ -1,11 +1,15 @@
 package main
 
 import (
+	"encoding/base64"
+	"flag"
 	"fmt"
 	"image/color"
 	"io"
 	"net/http"
+	"strconv"
 	"sync"
+	"unicode"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -31,26 +35,57 @@ func getRoot(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "See https://github.com/chrxer/safe-chrx-proto/tree/main/backend/server\n")
 }
 
-func handleEncrypt(w http.ResponseWriter, r *http.Request) {
+func handleEncrypt(w http.ResponseWriter, r *http.Request, key []byte) {
 	if !isPost(w, r) {
 		return
 	}
-	reqBody, err := io.ReadAll(r.Body)
+	var reqBody []byte
+	var err error
+	reqBody, err = io.ReadAll(r.Body)
 	if err != nil {
 		fmt.Printf("%s", err.Error())
+		reqBody = []byte("")
 	}
-	w.Write(encrypt(reqBody))
+
+	// encrypt
+	if len(key) != 0{
+		reqBody = decrypt(reqBody, key)
+	}
+
+	var encrypted []byte
+	encrypted = encrypt(reqBody, []byte(""))
+	if len(key) != 0{
+		encrypted = encrypt(encrypted, key)
+	}
+
+	w.Write(encrypted)
 }
 
-func handleDecrypt(w http.ResponseWriter, r *http.Request) {
+func handleDecrypt(w http.ResponseWriter, r *http.Request, key []byte) {
 	if !isPost(w, r) {
 		return
 	}
-	reqBody, err := io.ReadAll(r.Body)
+	var reqBody []byte
+	var err error
+	reqBody, err = io.ReadAll(r.Body)
 	if err != nil {
 		fmt.Printf("%s", err.Error())
+		reqBody = []byte("")
 	}
-	w.Write(decrypt(reqBody))
+
+	// decryption
+	if len(key) != 0{
+		reqBody = decrypt(reqBody, key)
+	}
+
+	var decrypted []byte
+	decrypted = decrypt(reqBody,[]byte(""))
+	
+	if len(key) != 0{
+		decrypted = encrypt(decrypted, key)
+	}
+
+	w.Write(decrypted)
 }
 
 func isPost(w http.ResponseWriter, r *http.Request) bool {
@@ -62,22 +97,37 @@ func isPost(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-func serve() {
+func serve(port int, key []byte) {
 		http.HandleFunc("/", getRoot)
-		http.HandleFunc("/encrypt", handleEncrypt)
-		http.HandleFunc("/decrypt", handleDecrypt)
-		err := http.ListenAndServe("localhost:3333", nil)
+		http.HandleFunc("/encrypt", func(w http.ResponseWriter, r *http.Request){handleEncrypt(w,r,key)})
+		http.HandleFunc("/decrypt", func(w http.ResponseWriter, r *http.Request){handleDecrypt(w,r,key)})
+		err := http.ListenAndServe("localhost:"+strconv.Itoa(port), nil)
 		if err != nil {
-			fmt.Println("Server error: ", err)
-			// Handle the error appropriately
+			panic(err)
 		}
 	}
 
 /* MAIN */
 
 func main() {
+	port:= flag.Int("port", 3333, "port to serve on")
+	reset:= flag.Bool("reset",false, "Reset the password. All currently encrypted data will be lost")
+	connBase64Key:=flag.String("conn-key", "", "(optional) base64 encoded 256bit AES connection key for testing. Should be passed over stdin instead")
+	flag.Parse()
+	if(*reset){
+		writeHash("")
+		panic("Reset password successfully")
+	}
+
+	var key []byte = []byte("")
+	if len(*connBase64Key) != 0{
+		key, _ = base64.StdEncoding.DecodeString(*connBase64Key)
+	}
+	if len(key) == 0{
+		key = readAESKeyFromStdin()
+	}
+
 	myApp = app.New()
-	myApp.Settings().SetTheme(theme.LightTheme())
 	drv := myApp.Driver()
 
 	if drv, ok := drv.(desktop.Driver); ok {
@@ -103,7 +153,7 @@ func main() {
 		fmt.Println("Failed to create splash window")
 	}
 
-	go serve()
+	go serve(*port, key)
 
 	myWindow.Hide()
 	myApp.Run() // Due to being hidden it runs in the background
@@ -120,7 +170,7 @@ func createPswdQueryWindow() *fyne.Container {
 	entry.SetPlaceHolder("Enter password...")
 
 	// errorLabel will be used to display errors (in red text)
-	errorLabel := canvas.NewText("Please enter master password...", color.Black)
+	errorLabel := canvas.NewText("Please enter master password...", theme.Color(theme.ColorNameForeground))
 	submitButton := widget.NewButton("OK", func() {
 		pswd := entry.Text
 		if len(pswd) < 8 {
@@ -155,7 +205,7 @@ func createPswdSetterWindow() *fyne.Container {
 	entry2.SetPlaceHolder("Confirm password...")
 
 	// errorLabel will be used to display errors (in red text)
-	errorLabel := canvas.NewText("Please create master password", color.Black)
+	errorLabel := canvas.NewText("Please create master password", theme.Color(theme.ColorNameForeground))
 	submitButton := widget.NewButton("OK", func() {
 		pswd1 := entry1.Text
 		pswd2 := entry2.Text
@@ -165,7 +215,27 @@ func createPswdSetterWindow() *fyne.Container {
 			errorLabel.Text = "Password must be at least 8 characters long"
 		} else if len(pswd1) > 32 {
 			errorLabel.Text = "Password cannot be over 32 characters long"
-		} else { 
+		} else {
+			for _, char := range pswd1 {
+				if !unicode.IsPrint(char) || unicode.IsSpace(char) {
+					errorLabel.Text = "Password can only contain printable characters"
+					return
+				}
+			}
+
+			firstChar := pswd1[0]
+			allSame := true
+			for i := 1; i < len(pswd1); i++ {
+				if pswd1[i] != firstChar {
+					allSame = false
+					break
+				}
+			}
+			if allSame {
+				errorLabel.Text = "Password cannot have all characters the same"
+				return
+			}
+			
 			writeHash(argonHash(pswd1))
 			userPassword = pswd1;
 			myWindow.Hide()

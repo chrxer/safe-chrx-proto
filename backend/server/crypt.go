@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"os"
@@ -14,11 +16,13 @@ import (
 	"github.com/emersion/go-appdir"
 )
 
-func encrypt(b []byte) []byte {
+func encrypt(b []byte, mP []byte) []byte {
 	if len(b) == 0 {
 		return []byte("")
 	}
-	mP := getMasterPassword()
+	if len(mP) == 0{
+		mP = getMasterPassword()
+	}
 	
 	// Create a new Cipher Block from the key
 	block, err := aes.NewCipher(mP)
@@ -45,11 +49,13 @@ func encrypt(b []byte) []byte {
 	return ciphertext
 }
 
-func decrypt(b []byte) []byte {
+func decrypt(b []byte, mP []byte) []byte {
 	if len(b) == 0 {
 		return []byte("")
 	}
-	mP := getMasterPassword()
+	if len(mP) == 0{
+		mP = getMasterPassword()
+	}
 
 	// Create a new Cipher Block from the key
 	block, err := aes.NewCipher(mP)
@@ -150,4 +156,22 @@ func writeHash(hash string) {
     if err != nil {
         fmt.Printf("%s", err.Error())
     }
+}
+
+func readAESKeyFromStdin() []byte {
+	fmt.Print("Enter AES key (base64 encoded, 256-bit): \n")
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	encodedKey := scanner.Text()
+
+	key, err := base64.StdEncoding.DecodeString(encodedKey)
+	if err != nil {
+		return []byte("")
+	}
+
+	if len(key) != 32 {
+		return []byte("")
+	}
+
+	return key
 }
