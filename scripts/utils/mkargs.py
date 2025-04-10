@@ -37,7 +37,6 @@ def make(debug=False, gapi_keys:Dict[str, str]=API_KEYS) -> List[str]:
         "angle_has_histograms=false",
         "build_angle_perftests=false",
         "treat_warnings_as_errors=false",
-        "use_qt=false",
         "is_cfi=false",
         "chrome_pgo_phase=0",
 

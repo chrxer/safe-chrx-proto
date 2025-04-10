@@ -8,3 +8,34 @@ source_set("os_crypt_hook") {
 shared_library("chrx"){
   deps=["//chrx:os_crypt_hook"]
 }
+source_set("aes_crypt") {
+  include_dirs = ["aes_crypt"]
+  sources = [
+    "aes_crypt/aes_crypt.cc",
+  ]
+  deps = [
+    "//third_party/boringssl",
+  ]
+}
+
+source_set("aes_crypt_unittest") {
+  testonly = true
+  sources = [
+    "aes_crypt/aes_crypt_unittest.cc",
+  ]
+  deps = [
+    ":aes_crypt",
+    "//testing/gtest",
+  ]
+}
+
+executable("chrx_unittest") {
+  testonly = true
+  sources = [
+      "chrx_unittest.cc",
+  ]
+  deps = [
+      "//testing/gtest",
+      "//chrx:aes_crypt_unittest"
+  ]
+}

@@ -11,8 +11,9 @@ Usage of ./chrxCryptServer:
 ```
 ```
 Usage of ./serverTest:
+Usage of ./serverTest:
   -conn-key string
-        (optional) base64 encoded 256bit AES connection key for testing
+        (optional) base64 encoded 256bit AES connection key for testing. Won't start server process if provided.
   -port int
         port on which server runs (default 3333)
   -server string
