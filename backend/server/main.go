@@ -12,6 +12,7 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/driver/desktop"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -76,6 +77,7 @@ func serve() {
 
 func main() {
 	myApp = app.New()
+	myApp.Settings().SetTheme(theme.LightTheme())
 	drv := myApp.Driver()
 
 	if drv, ok := drv.(desktop.Driver); ok {
@@ -122,18 +124,16 @@ func createPswdQueryWindow() *fyne.Container {
 	submitButton := widget.NewButton("OK", func() {
 		pswd := entry.Text
 		if len(pswd) < 8 {
-			errorLabel.Text = "Password is too short"
+			errorLabel.Text = "Password must be at least 8 characters long"
 		} else if len(pswd) > 32 {
-			errorLabel.Text = "Password is too long"
-		} else { 
-			if isValid(pswd) {
-				userPassword = pswd;
-				myWindow.Hide()
-				wg.Done() // See getMasterPassword() in crypt.go
-				return
-			} else {
-				errorLabel.Text = "Invalid password"
-			}
+			errorLabel.Text = "Password cannot be over 32 characters long"
+		} else if isValid(pswd) {
+			userPassword = pswd;
+			myWindow.Hide()
+			wg.Done() // See getMasterPassword() in crypt.go
+			return
+		} else {
+			errorLabel.Text = "Invalid password"
 		}
 		// Set error color (red)
 		errorLabel.Color = color.RGBA{R: 255, G: 80, B: 80, A: 255}
@@ -160,11 +160,11 @@ func createPswdSetterWindow() *fyne.Container {
 		pswd1 := entry1.Text
 		pswd2 := entry2.Text
 		if pswd1 != pswd2 {
-			errorLabel.Text = "Passwords need to be identical"
+			errorLabel.Text = "Passwords must be identical"
 		} else if (len(pswd1) < 8) {
-			errorLabel.Text = "Password is too short"
+			errorLabel.Text = "Password must be at least 8 characters long"
 		} else if len(pswd1) > 32 {
-			errorLabel.Text = "Password is too long"
+			errorLabel.Text = "Password cannot be over 32 characters long"
 		} else { 
 			writeHash(argonHash(pswd1))
 			userPassword = pswd1;

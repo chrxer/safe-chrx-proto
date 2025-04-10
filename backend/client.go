@@ -26,7 +26,6 @@ func _req(s []byte, endpoint string) []byte {
 		fmt.Printf("%s", err.Error())
 		return []byte("")
 	}
-	fmt.Printf("%v", resp.StatusCode)
 	defer resp.Body.Close()
 
 	//fmt.Printf("\n%s\n", resp.Body)
@@ -42,8 +41,6 @@ func _req(s []byte, endpoint string) []byte {
 		return []byte("")
 	}
 
-	fmt.Printf("Body: %v\n", body)
-
 	return body
 }
 
@@ -58,8 +55,11 @@ func decrypt(s []byte) []byte {
 func main() {
 	data := []byte("password")
 	encrypted := encrypt(data)
-	fmt.Printf("\nData: %v\nEncrypted: %v\n", data, encrypted)
-	decrypted := decrypt(encrypted)
+	fmt.Printf("\nPlaintext: %s\nEncrypted (hex): %x (%s)\n", data, encrypted,encrypted)
+	var decrypted = []byte("")
+	decrypt(encrypted)
+	decrypt(encrypted)
+	decrypted = decrypt(encrypted)
 
-	fmt.Printf("\nData: %s\nEncrypted: %s\nDecrypted: %s", data, encrypted, decrypted)
+	fmt.Printf("Decrypted: %s\n\n", decrypted)
 }

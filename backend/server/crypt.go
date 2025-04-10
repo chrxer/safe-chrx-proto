@@ -118,20 +118,26 @@ func argonCheckPswd(pswd string, hash string) bool {
 func getHashFile() string {
     dirs := appdir.New("chrx-safe-proto")
 	p := dirs.UserConfig()
-	if err := os.MkdirAll(p, 0666); err != nil {
+	if err := os.MkdirAll(p, 0700); err != nil {
 		panic(err)
 	}
-	f, err := os.Create(filepath.Join(p, "argon2.hash"))
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-	return p
+	fpath:= filepath.Join(p, "argon2.hash")
+	
+	if _, err := os.Stat(fpath); os.IsNotExist(err) {
+        f, err := os.Create(fpath)
+        if err != nil {
+            panic(err)
+        }
+        defer f.Close()
+    }
+
+	return fpath
 }
 
 func fetchHash() string {
 	
-	dat, err := os.ReadFile(getHashFile())
+	hashf:=getHashFile()
+	dat, err := os.ReadFile(hashf)
 	if err != nil {
         panic(err)
     }
@@ -140,7 +146,7 @@ func fetchHash() string {
 
 func writeHash(hash string) {
 	data := []byte(hash)
-    err := os.WriteFile(getHashFile(), data, 0666)
+    err := os.WriteFile(getHashFile(), data, 0600)
     if err != nil {
         fmt.Printf("%s", err.Error())
     }

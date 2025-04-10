@@ -1,5 +1,11 @@
 ## Dependencies
 Requires [golang](https://go.dev/doc/install) to be installed.
+```bash
+go get serverTest
+cd server
+go get chrxCryptServer
+cd ..
+```
 
 #### Linux/Debian
 ```bash

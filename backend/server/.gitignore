@@ -1,4 +1,4 @@
 chrxCryptServer
 chrxCryptServer.exe
-__debug_bin*.exe
+__debug_bin*
 go.sum

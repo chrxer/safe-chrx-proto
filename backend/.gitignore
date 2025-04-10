@@ -1,3 +1,5 @@
 serverTest
 serverTest.exe
+client.exe
+__debug_bin*
 go.sum
