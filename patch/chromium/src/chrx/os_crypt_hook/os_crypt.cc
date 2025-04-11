@@ -1,19 +1,51 @@
 #include "third_party/crashpad/crashpad/third_party/cpp-httplib/cpp-httplib/httplib.h"
-// TODO(@kaliiiiiiiiii) use chrx/third_party/HTTPRequest or /net instead
-
+#include "../chrx_server/chrx_server.h"
+#include "../aes_crypt/aes_crypt.h"
+#include <vector>
 #include <string>
+#include <cstdint>
 
-const std::string url = "http://localhost:3333";
+using ByteVector = std::vector<uint8_t>;
 
 bool ChrxSendRequest(const std::string& endpoint, const std::string& input, std::string& output) {
-    httplib::Client client(url);
-    auto response = client.Post(endpoint.c_str(), input, "application/json");
+  // Get server port and key from the launcher
+  auto& launcher = CryptServerLauncher::Instance();
+  int port = launcher.GetPort();
+  const std::string& key = launcher.GetKey();
 
-    if (response && response->status == 200) {
-        output = response->body;
-        return true;
-    }
-    return false;
+  std::string url = "http://localhost:" + std::to_string(port);
+  httplib::Client client(url);
+
+  // Convert strings to byte vectors
+  ByteVector input_vec(input.begin(), input.end());
+  ByteVector key_vec(key.begin(), key.end());
+  ByteVector encrypted_vec;
+
+  // Encrypt the input data before sending
+  if (!EncryptAESGCM(input_vec, key_vec, encrypted_vec)) {
+      return false;
+  }
+
+  // Convert encrypted vector back to string for sending
+  std::string encrypted_input(encrypted_vec.begin(), encrypted_vec.end());
+
+  auto response = client.Post(endpoint.c_str(), encrypted_input, "application/octet-stream");
+
+  if (response && response->status == 200) {
+      // Convert response to vector for decryption
+      ByteVector response_vec(response->body.begin(), response->body.end());
+      ByteVector output_vec;
+
+      // Decrypt the response
+      if (!DecryptAESGCM(response_vec, key_vec, output_vec)) {
+          return false;
+      }
+
+      // Convert decrypted vector back to string
+      output.assign(output_vec.begin(), output_vec.end());
+      return true;
+  }
+  return false;
 }
 
 bool ChrxEncrypt(const std::string& plaintext, std::string& ciphertext) {
