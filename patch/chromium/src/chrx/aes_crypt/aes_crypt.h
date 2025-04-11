@@ -10,6 +10,8 @@ constexpr size_t kKeySize = 32;  // AES-256 key size
 constexpr size_t kIvSize = 12;   // GCM standard nonce size
 constexpr size_t kTagSize = 16;  // GCM authentication tag size
 
+std::string randKey();
+
 // Generates SHA-256 hash of the input string.
 std::vector<uint8_t> NewSHA256(const std::string& input);
 

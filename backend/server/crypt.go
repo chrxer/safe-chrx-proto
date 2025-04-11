@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
@@ -11,6 +12,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/alexedwards/argon2id"
 	"github.com/emersion/go-appdir"
@@ -84,7 +87,7 @@ func decrypt(b []byte, mP []byte) []byte {
 }
 
 func getMasterPassword() []byte {
-	if len(masterKey) == 0 {
+	if bytes.Equal(masterKey,[]byte("")) {
 		// In case the user attempts closing the window
 		for(len(userPassword) == 0) {
 			wg.Add(1)
@@ -159,19 +162,34 @@ func writeHash(hash string) {
 }
 
 func readAESKeyFromStdin() []byte {
-	fmt.Print("Enter AES key (base64 encoded, 256-bit): \n")
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	encodedKey := scanner.Text()
+    // Create buffered reader for more reliable reading
+    reader := bufio.NewReader(os.Stdin)
+    
+    // Read with timeout support
+    result := make(chan []byte)
+    go func() {
+        line, err := reader.ReadString('\n')
+        if err != nil {
+            panic(fmt.Sprintf("Failed to read stdin: %v", err))
+        }
+        
+        key, err := base64.StdEncoding.DecodeString(strings.TrimSpace(line))
+        if err != nil {
+            panic(fmt.Sprintf("Failed to decode key as base64: %v", err))
+        }
+        
+        if len(key) != 32 {
+            panic(fmt.Sprintf("Expected 256bit key\nLength: %d", len(key)))
+        }
+        
+        result <- key
+    }()
 
-	key, err := base64.StdEncoding.DecodeString(encodedKey)
-	if err != nil {
-		return []byte("")
-	}
-
-	if len(key) != 32 {
-		return []byte("")
-	}
-
-	return key
+    // Wait for either the result or timeout
+    select {
+    case key := <-result:
+        return key
+    case <-time.After(5 * time.Second):
+        panic("Timed out waiting for AES key input")
+    }
 }

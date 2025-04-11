@@ -1,13 +1,13 @@
 #!scripts/.venv/bin/python3
 
-from utils import ccache_, DEPOT_TOOLS, OUT, SRC, mkargs, GOOGLEPYTHON, GOOGLEENV
-from utils.wrap import pyexc
-from pack import pack_build
-
-import os
 import sys
 import datetime
-from pathlib import Path
+import shutil
+
+from utils import ccache_, DEPOT_TOOLS, OUT, SRC, mkargs, GOOGLEPYTHON, GOOGLEENV, WRK
+from utils.wrap import pyexc, exc
+from pack import pack_build
+
 
 def gn(outdir:str,target:str="chrome",debug:bool=False):
     # find root-target
@@ -17,13 +17,20 @@ def gn(outdir:str,target:str="chrome",debug:bool=False):
         root_target=targs[0]
 
     ccache_.set_max_g(20)
-    poutdir = SRC.joinpath(outdir)
     args = mkargs.make(debug=debug)
     pargs= ' '.join(args)
     gnargs = [str(DEPOT_TOOLS.joinpath("gn.py")), "gen", outdir, f"--args={pargs}"]
     if root_target is not None:
         gnargs.append(f"--root-target={root_target}")
     pyexc(*gnargs, cwd=SRC, python=GOOGLEPYTHON, env=GOOGLEENV)
+
+def build_server(outdir:str):
+    build_dir = WRK.joinpath("backend/server")
+    out_dir = SRC.joinpath(outdir)
+    exec_name="chrxCryptServer"
+    exc("go", "build", exec_name, cwd=build_dir)
+    shutil.copy2(build_dir.joinpath(exec_name), out_dir.joinpath(exec_name))
+
 
 
 def build(target:str="chrome",debug:bool=False):
@@ -34,6 +41,7 @@ def build(target:str="chrome",debug:bool=False):
     OUTD=OUT.joinpath(tag)
     OUTR=str(OUTD.relative_to(SRC))
     
+    build_server(outdir=OUTR)
     gn(outdir=OUTR, target=target, debug=debug)
     
     ccache_.show()

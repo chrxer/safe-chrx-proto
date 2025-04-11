@@ -12,11 +12,14 @@ source_set("aes_crypt") {
   include_dirs = ["aes_crypt"]
   sources = [
     "aes_crypt/aes_crypt.cc",
+    "aes_crypt/aes_crypt.h"
   ]
   deps = [
+    "//base",
     "//third_party/boringssl",
   ]
 }
+
 
 source_set("aes_crypt_unittest") {
   testonly = true
@@ -29,6 +32,32 @@ source_set("aes_crypt_unittest") {
   ]
 }
 
+source_set("chrx_server") {
+  include_dirs = ["chrx_server"]
+  sources = [
+    "chrx_server/chrx_server.cc",
+    "chrx_server/chrx_server.h",
+    "chrx_server/ports.cc",
+    "chrx_server/ports.h",
+  ]
+  deps = [
+    "//base",
+    ":aes_crypt"
+  ]
+}
+
+source_set("chrx_server_unittest") {
+  testonly = true
+  sources = [
+    "chrx_server/chrx_server_unittest.cc",
+  ]
+  deps = [
+    "//testing/gtest",
+    "//base",
+    ":chrx_server"
+  ]
+}
+
 executable("chrx_unittest") {
   testonly = true
   sources = [
@@ -36,6 +65,7 @@ executable("chrx_unittest") {
   ]
   deps = [
       "//testing/gtest",
-      "//chrx:aes_crypt_unittest"
+      ":aes_crypt_unittest",
+      ":chrx_server_unittest",
   ]
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/base64"
 	"flag"
 	"fmt"
@@ -31,8 +32,15 @@ var myWindow fyne.Window
 
 /* SERVER ENDPOINT */
 
-func getRoot(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "See https://github.com/chrxer/safe-chrx-proto/tree/main/backend/server\n")
+func getRoot(w http.ResponseWriter, is_locked bool) {
+	var response string;
+	response = "See https://github.com/chrxer/safe-chrx-proto/tree/main/backend/server\n"
+	if is_locked{
+		response += "Status: Locked"
+	}else{
+		response += "Status: Unlocked"
+	}
+	io.WriteString(w, response)
 }
 
 func handleEncrypt(w http.ResponseWriter, r *http.Request, key []byte) {
@@ -98,7 +106,9 @@ func isPost(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func serve(port int, key []byte) {
-		http.HandleFunc("/", getRoot)
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request){
+			getRoot(w,bytes.Equal(masterKey,[]byte("")))
+		})
 		http.HandleFunc("/encrypt", func(w http.ResponseWriter, r *http.Request){handleEncrypt(w,r,key)})
 		http.HandleFunc("/decrypt", func(w http.ResponseWriter, r *http.Request){handleDecrypt(w,r,key)})
 		err := http.ListenAndServe("localhost:"+strconv.Itoa(port), nil)
@@ -150,7 +160,7 @@ func main() {
 		myWindow.SetContent(container.NewPadded(content))
 		myWindow.Resize(content.Size())
 	} else {
-		fmt.Println("Failed to create splash window")
+		panic("Failed to create splash window")
 	}
 
 	go serve(*port, key)
