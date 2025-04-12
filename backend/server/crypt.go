@@ -8,7 +8,6 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -109,7 +108,7 @@ func NewSHA256(data []byte) []byte {
 func argonHash(pswd string) string {
 	hash, err := argon2id.CreateHash(pswd, argon2id.DefaultParams)
 	if err != nil {
-		fmt.Printf("%s", err.Error())
+		panic(err.Error())
 	}
 	return hash
 }
@@ -117,7 +116,7 @@ func argonHash(pswd string) string {
 func argonCheckPswd(pswd string, hash string) bool {
 	match, err := argon2id.ComparePasswordAndHash(pswd, hash)
 	if err != nil {
-		fmt.Printf("%s", err.Error())
+		panic(err.Error())
 	}
 	return match
 }
@@ -128,14 +127,14 @@ func getHashFile() string {
     dirs := appdir.New("chrx-safe-proto")
 	p := dirs.UserConfig()
 	if err := os.MkdirAll(p, 0700); err != nil {
-		panic(err)
+		panic(err.Error())
 	}
 	fpath:= filepath.Join(p, "argon2.hash")
 	
 	if _, err := os.Stat(fpath); os.IsNotExist(err) {
         f, err := os.Create(fpath)
         if err != nil {
-            panic(err)
+            panic(err.Error())
         }
         defer f.Close()
     }
@@ -148,7 +147,7 @@ func fetchHash() string {
 	hashf:=getHashFile()
 	dat, err := os.ReadFile(hashf)
 	if err != nil {
-        panic(err)
+        panic(err.Error())
     }
     return string(dat)
 }
@@ -157,7 +156,7 @@ func writeHash(hash string) {
 	data := []byte(hash)
     err := os.WriteFile(getHashFile(), data, 0600)
     if err != nil {
-        fmt.Printf("%s", err.Error())
+        panic(err.Error())
     }
 }
 
@@ -170,16 +169,16 @@ func readAESKeyFromStdin() []byte {
     go func() {
         line, err := reader.ReadString('\n')
         if err != nil {
-            panic(fmt.Sprintf("Failed to read stdin: %v", err))
+            panic(err.Error())
         }
         
         key, err := base64.StdEncoding.DecodeString(strings.TrimSpace(line))
         if err != nil {
-            panic(fmt.Sprintf("Failed to decode key as base64: %v", err))
+            panic(err.Error())
         }
         
         if len(key) != 32 {
-            panic(fmt.Sprintf("Expected 256bit key\nLength: %d", len(key)))
+            panic(err.Error())
         }
         
         result <- key
@@ -191,5 +190,6 @@ func readAESKeyFromStdin() []byte {
         return key
     case <-time.After(5 * time.Second):
         panic("Timed out waiting for AES key input")
+		panic("")
     }
 }

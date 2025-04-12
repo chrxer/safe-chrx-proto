@@ -2,14 +2,19 @@ package main
 
 import (
 	"bytes"
-	"encoding/base64"
 	"flag"
 	"fmt"
 	"image/color"
 	"io"
+	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"path"
+	"runtime/debug"
 	"strconv"
 	"sync"
+	"syscall"
 	"unicode"
 
 	"fyne.io/fyne/v2"
@@ -51,20 +56,16 @@ func handleEncrypt(w http.ResponseWriter, r *http.Request, key []byte) {
 	var err error
 	reqBody, err = io.ReadAll(r.Body)
 	if err != nil {
-		fmt.Printf("%s", err.Error())
+		log.Println(err.Error())
 		reqBody = []byte("")
 	}
 
 	// encrypt
-	if len(key) != 0{
-		reqBody = decrypt(reqBody, key)
-	}
+	reqBody = decrypt(reqBody, key)
 
 	var encrypted []byte
 	encrypted = encrypt(reqBody, []byte(""))
-	if len(key) != 0{
-		encrypted = encrypt(encrypted, key)
-	}
+	encrypted = encrypt(encrypted, key)
 
 	w.Write(encrypted)
 }
@@ -77,21 +78,17 @@ func handleDecrypt(w http.ResponseWriter, r *http.Request, key []byte) {
 	var err error
 	reqBody, err = io.ReadAll(r.Body)
 	if err != nil {
-		fmt.Printf("%s", err.Error())
+		log.Println(err.Error())
 		reqBody = []byte("")
 	}
 
 	// decryption
-	if len(key) != 0{
-		reqBody = decrypt(reqBody, key)
-	}
+	reqBody = decrypt(reqBody, key)
 
 	var decrypted []byte
 	decrypted = decrypt(reqBody,[]byte(""))
 	
-	if len(key) != 0{
-		decrypted = encrypt(decrypted, key)
-	}
+	decrypted = encrypt(decrypted, key)
 
 	w.Write(decrypted)
 }
@@ -113,32 +110,59 @@ func serve(port int, key []byte) {
 		http.HandleFunc("/decrypt", func(w http.ResponseWriter, r *http.Request){handleDecrypt(w,r,key)})
 		err := http.ListenAndServe("localhost:"+strconv.Itoa(port), nil)
 		if err != nil {
-			panic(err)
+			panic(err.Error())
 		}
 	}
 
 /* MAIN */
 
 func main() {
-	port:= flag.Int("port", 3333, "port to serve on")
-	reset:= flag.Bool("reset",false, "Reset the password. All currently encrypted data will be lost")
-	connBase64Key:=flag.String("conn-key", "", "(optional) base64 encoded 256bit AES connection key for testing. Should be passed over stdin instead")
-	flag.Parse()
-	if(*reset){
-		writeHash("")
-		panic("Reset password successfully")
+	// Set up logging file first
+	tmpFile, err := os.OpenFile(path.Join(os.TempDir(), "chrxCryptServerLog.log"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal("Could not create temporary log file", err)
 	}
+	log.SetOutput(tmpFile)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+	fmt.Printf("Logging to file at :\"%s\"\n", tmpFile.Name())
 
-	var key []byte = []byte("")
-	if len(*connBase64Key) != 0{
-		key, _ = base64.StdEncoding.DecodeString(*connBase64Key)
+	var port *int
+	// Ensure cleanup on exit
+	defer func() {
+		log.Printf("Exiting (port: %d)\n", *port)
+		if r := recover(); r != nil {
+			s:= fmt.Sprintf("%s: %s", r, debug.Stack())
+			log.Println(s)
+			println(s)
+		}
+		
+		tmpFile.Close()
+	}()
+
+	// Catch OS signals
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		s := <-sigChan
+		log.Printf("Caught signal: %s, contintuing anyways\n", s)
+	}()
+
+	// CLI flags
+	port = flag.Int("port", 3333, "port to serve on")
+	reset := flag.Bool("reset", false, "Reset the password. All currently encrypted data will be lost")
+	flag.Parse()
+	if *reset {
+		writeHash("")
+		log.Printf("Password reset by user\n")
+		return
 	}
-	if len(key) == 0{
-		key = readAESKeyFromStdin()
-	}
+	
+	key := readAESKeyFromStdin()
 
 	myApp = app.New()
 	drv := myApp.Driver()
+
+	log.Printf("Started on %d\n",*port)
 
 	if drv, ok := drv.(desktop.Driver); ok {
 		myWindow = drv.CreateSplashWindow()

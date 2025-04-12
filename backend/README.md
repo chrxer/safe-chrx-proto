@@ -2,13 +2,13 @@
 
 ```bash
 Usage of ./chrxCryptServer:
-  -conn-key string
-        (optional) base64 encoded 256bit AES connection key for testing. Should be passed over stdin instead
   -port int
         port to serve on (default 3333)
   -reset
         Reset the password. All currently encrypted data will be lost
 ```
+A AES265 key has to be passed base64 encoded to the server over `stdin`
+
 ```
 Usage of ./serverTest:
 Usage of ./serverTest:
@@ -43,6 +43,9 @@ cd server
 go build chrxCryptServer
 cd ..
 ``` 
+
+### Logging
+Logs can be found in the default `%tmp%` directory, under the filename `chrxCryptServerLog.log` (`/tmp/chrxCryptServerLog.log` on Linux)
 
 # References
 

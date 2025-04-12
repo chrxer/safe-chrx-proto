@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/base64"
 	"flag"
@@ -83,7 +82,6 @@ func main() {
 	}
 	
 	encodedKey := base64.StdEncoding.EncodeToString(connKey)
-	println("Connection AES key: ", encodedKey)
 
 	// start the server
 	if len(*serverPath) == 0 {
@@ -120,16 +118,6 @@ func main() {
 			return
 		}
 
-		// read one line from server (wait till ready to receive)
-		stdoutReader := bufio.NewReader(stdoutPipe)
-		line, err := stdoutReader.ReadString('\n')
-		if err != nil {
-			fmt.Printf("Error reading from stdout: %v\n", err)
-			cmd.Process.Kill()
-			return
-		}
-		fmt.Printf("Server says: %s", line)
-
 		_, err = stdin.Write([]byte(encodedKey + "\n"))
 		if err != nil {
 			// Print and return error
@@ -149,7 +137,7 @@ func main() {
 	var decrypted = []byte("")
 	var encrypted = []byte("")
 	encrypted = serverEncrypt(data, *port, connKey)
-	fmt.Printf("\nPlaintext: %s\nEncrypted (hex): %x (%s)\n", data, encrypted,encrypted)
+	fmt.Printf("\nPlaintext: %s\nEncrypted (hex): %x \nEncrypted: \"%s\"\n", data, encrypted,encrypted)
 	serverDecrypt(encrypted, *port, connKey)
 	serverDecrypt(encrypted, *port, connKey)
 	decrypted = serverDecrypt(encrypted,*port, connKey)
