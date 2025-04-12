@@ -51,6 +51,20 @@ const std::string& CryptServerLauncher::GetKey() {
   return aes_key_;
 }
 
+int CryptServerLauncher::GetExitCode() {
+  if (!started_ || !server_process_.IsValid()) {
+    return -1;
+  }
+
+  int exit_code = -1;
+  if (server_process_.WaitForExitWithTimeout(base::Seconds(0), &exit_code)) {
+    return exit_code;
+  }
+
+  return -1;  // Process still running
+}
+
+
 bool CryptServerLauncher::Start() {
   if (started_) return true;
   return LaunchChild();
@@ -95,9 +109,9 @@ bool CryptServerLauncher::LaunchChild() {
   fcntl(parent_read.get(), F_SETFL, O_NONBLOCK);
 #endif
 
-  LOG(INFO) << "Starting process" << cmd.GetCommandLineString();
-  base::Process process = base::LaunchProcess(cmd, options);
-  if (!process.IsValid()) {
+  LOG(INFO) << "Starting process: " << cmd.GetCommandLineString();
+  server_process_ = base::LaunchProcess(cmd, options);
+  if (!server_process_.IsValid()) {
     LOG(ERROR) << "Failed to launch server process";
     return false;
   }
@@ -133,7 +147,7 @@ bool CryptServerLauncher::LaunchChild() {
   }
 
   int exit_code;
-  if (process.WaitForExitWithTimeout(base::Seconds(0), &exit_code)) {
+  if (server_process_.WaitForExitWithTimeout(base::Seconds(0), &exit_code)) {
     LOG(ERROR) << "Server died immediately: " << exit_code;
     return false;
   }

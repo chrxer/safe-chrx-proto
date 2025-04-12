@@ -124,7 +124,7 @@ func main() {
 	}
 	log.SetOutput(tmpFile)
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
-	fmt.Printf("Logging to file at :\"%s\"\n", tmpFile.Name())
+	go fmt.Printf("Logging to file at :\"%s\"\n", tmpFile.Name())
 
 	var port *int
 	// Ensure cleanup on exit
