@@ -50,7 +50,7 @@ index ff1e356ff6..5c29a09dfe 100644
    configs += [ "//build/config/compiler:wexit_time_destructors" ]
    defines = [ "IS_OS_CRYPT_IMPL" ]
 diff --git a/components/os_crypt/sync/os_crypt_linux.cc b/components/os_crypt/sync/os_crypt_linux.cc
-index 533cc486cb..7d684a49d5 100644
+index 533cc486cb..738c7f84bf 100644
 --- a/components/os_crypt/sync/os_crypt_linux.cc
 +++ b/components/os_crypt/sync/os_crypt_linux.cc
 @@ -2,6 +2,9 @@
@@ -58,7 +58,7 @@ index 533cc486cb..7d684a49d5 100644
  // found in the LICENSE file.
  
 +// import added by chrx
-+#include "chrx/os_crypt_hook/os_crypt.cc"
++#include "chrx/os_crypt_hook/os_crypt.h"
 +
  #include "components/os_crypt/sync/os_crypt.h"
  
@@ -165,7 +165,7 @@ index 533cc486cb..7d684a49d5 100644
  
  void OSCryptImpl::SetConfig(std::unique_ptr<os_crypt::Config> config) {
 diff --git a/components/os_crypt/sync/os_crypt_mac.mm b/components/os_crypt/sync/os_crypt_mac.mm
-index 15309ae1b3..d5edfc263a 100644
+index 15309ae1b3..9cdf23576a 100644
 --- a/components/os_crypt/sync/os_crypt_mac.mm
 +++ b/components/os_crypt/sync/os_crypt_mac.mm
 @@ -2,6 +2,9 @@
@@ -173,7 +173,7 @@ index 15309ae1b3..d5edfc263a 100644
  // found in the LICENSE file.
  
 +// import added by chrx
-+#include "chrx/os_crypt_hook/os_crypt.cc"
++#include "chrx/os_crypt_hook/os_crypt.h"
 +
  #include "components/os_crypt/sync/os_crypt.h"
  
@@ -256,7 +256,7 @@ index 15309ae1b3..d5edfc263a 100644
  
  bool OSCryptImpl::IsEncryptionAvailable() {
 diff --git a/components/os_crypt/sync/os_crypt_win.cc b/components/os_crypt/sync/os_crypt_win.cc
-index 6cb720a5e1..e7a836b15e 100644
+index 6cb720a5e1..2be03a25c0 100644
 --- a/components/os_crypt/sync/os_crypt_win.cc
 +++ b/components/os_crypt/sync/os_crypt_win.cc
 @@ -2,6 +2,9 @@
@@ -264,7 +264,7 @@ index 6cb720a5e1..e7a836b15e 100644
  // found in the LICENSE file.
  
 +// import added by chrx
-+#include "chrx/os_crypt_hook/os_crypt.cc"
++#include "chrx/os_crypt_hook/os_crypt.h"
 +
  #include "components/os_crypt/sync/os_crypt.h"
  

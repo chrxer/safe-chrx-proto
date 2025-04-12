@@ -6,7 +6,7 @@ after_first_comments = rb'^(\s*(?://.*\n|/\*[^*]*\*+(?:[^/*][^*]*\*+)*/\s*\n?)+\
 
 add: cc = b"""
 // import added by chrx
-#include "chrx/os_crypt_hook/os_crypt.cc"
+#include "chrx/os_crypt_hook/os_crypt.h"
 """
 
 encrypt: cc = b"""

@@ -1,18 +1,3 @@
-source_set("os_crypt_hook") {
-  # testonly = true # chrxer commented
-  include_dirs = [ "os_crypt_hook" ]
-  sources = [ "os_crypt_hook/os_crypt.cc" ]
-  deps = [
-    "//base",
-    "//third_party/crashpad/crashpad/third_party/cpp-httplib",
-    ":aes_crypt",
-    ":chrx_server"
-  ]
-}
-
-shared_library("chrx"){
-  deps=["//chrx:os_crypt_hook"]
-}
 source_set("aes_crypt") {
   include_dirs = ["aes_crypt"]
   sources = [
@@ -25,24 +10,12 @@ source_set("aes_crypt") {
   ]
 }
 
-
-source_set("aes_crypt_unittest") {
-  testonly = true
-  sources = [
-    "aes_crypt/aes_crypt_unittest.cc",
-  ]
-  deps = [
-    ":aes_crypt",
-    "//testing/gtest",
-  ]
-}
-
 source_set("chrx_server") {
   include_dirs = ["chrx_server"]
   sources = [
     "chrx_server/chrx_server.cc",
     "chrx_server/chrx_server.h",
-    "chrx_server/ports.cc",
+    "chrx_server/ports.cc", 
     "chrx_server/ports.h",
   ]
   deps = [
@@ -51,11 +24,40 @@ source_set("chrx_server") {
   ]
 }
 
+source_set("os_crypt_hook") {
+  include_dirs = ["os_crypt_hook"]
+  sources = [
+        "os_crypt_hook/os_crypt.cc",
+        "os_crypt_hook/os_crypt.h"
+      ]
+  deps = [
+    "//base",
+    "//third_party/crashpad/crashpad/third_party/cpp-httplib",
+    ":aes_crypt",
+    ":chrx_server"
+  ]
+}
+
+source_set("chrx") {
+  deps = [
+    ":os_crypt_hook"
+  ]
+}
+
+# Test targets below
+
+source_set("aes_crypt_unittest") {
+  testonly = true
+  sources = ["aes_crypt/aes_crypt_unittest.cc"]
+  deps = [
+    ":aes_crypt",
+    "//testing/gtest",
+  ]
+}
+
 source_set("chrx_server_unittest") {
   testonly = true
-  sources = [
-    "chrx_server/chrx_server_unittest.cc",
-  ]
+  sources = ["chrx_server/chrx_server_unittest.cc"]
   deps = [
     "//testing/gtest",
     "//base",
@@ -65,12 +67,10 @@ source_set("chrx_server_unittest") {
 
 executable("chrx_unittest") {
   testonly = true
-  sources = [
-      "chrx_unittest.cc",
-  ]
+  sources = ["chrx_unittest.cc"]
   deps = [
-      "//testing/gtest",
-      ":aes_crypt_unittest",
-      ":chrx_server_unittest",
+    "//testing/gtest",
+    ":aes_crypt_unittest",
+    ":chrx_server_unittest",
   ]
 }
