@@ -1,3 +1,0 @@
-[submodule "grammars/tree-sitter-gn"]
-	path = grammars/tree-sitter-gn
-	url = https://github.com/willcassella/tree-sitter-gn

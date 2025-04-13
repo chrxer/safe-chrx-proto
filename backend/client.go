@@ -19,7 +19,6 @@ import (
 func _req(s []byte, port int, endpoint string) []byte {
 	endpoint_url := "http://localhost:" + strconv.Itoa(port) + "/" + endpoint
 	
-	// Set up the HTTP client with a 10-second timeout
 	client := &http.Client{
 		Timeout: 60 * time.Second,
 	}
@@ -37,7 +36,6 @@ func _req(s []byte, port int, endpoint string) []byte {
 
 		resp, err = client.Do(req)
 		if err == nil && resp.StatusCode == 200 {
-			// Successfully got a valid response
 			defer resp.Body.Close()
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -50,17 +48,19 @@ func _req(s []byte, port int, endpoint string) []byte {
 		time.Sleep(100 * time.Millisecond)
 	}
 
-	fmt.Printf("Failed to connect after 60 seconds\n")
+	fmt.Printf("Failed to connect within 60 seconds\n")
 	return []byte("")
 }
 
 func serverEncrypt(s []byte,port int, connKey []byte) []byte {
+	// encrypt over chrxCryptServer
 	s = encrypt(s, connKey)
 	res:= _req(s, port,"encrypt")
 	return decrypt(res, connKey)
 }
 
 func serverDecrypt(s []byte, port int, connKey []byte) []byte {
+	// decrypt over chrxCryptServer
 	s = encrypt(s, connKey)
 	res:=_req(s, port, "decrypt")
 	return decrypt(res, connKey)
@@ -127,6 +127,8 @@ func main() {
 			}
 		}
 		fmt.Printf("%s\n", encodedKey)
+
+		// stream stdout & stderr from server to stdout for debugging
 		go logOutput(stdoutPipe, "stdout")
 		go logOutput(stderrPipe, "stderr")
 	}
@@ -153,6 +155,7 @@ func main() {
 }
 
 func logOutput(reader io.Reader, outputType string) {
+	// stream io.Reader to stdout
 	buf := make([]byte, 1024)
 	for {
 		n, err := reader.Read(buf)

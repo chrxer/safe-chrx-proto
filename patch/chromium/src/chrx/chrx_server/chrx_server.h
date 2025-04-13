@@ -27,5 +27,5 @@ private:
     int port_;
     std::string aes_key_;
     base::FilePath executable_path_;
-    base::Process server_process_;  // Track the launched server process
+    base::Process server_process_;
 };

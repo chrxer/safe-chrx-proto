@@ -6,29 +6,22 @@ TEST(ChrxEncryptDecryptTest, EncryptDecryptTest) {
     std::string encrypted_text;
     std::string decrypted_text;
 
-    // Encrypt the plaintext
     ASSERT_TRUE(ChrxEncrypt(plaintext, encrypted_text));
-
-    // Decrypt the ciphertext
     ASSERT_TRUE(ChrxDecrypt(decrypted_text, encrypted_text));
-
-    // Check if decrypted text matches the original plaintext
     ASSERT_EQ(plaintext, decrypted_text);
 }
 
 TEST(ChrxEncryptDecryptTest, DecryptWithIncorrectCiphertext) {
     std::string incorrect_ciphertext = "InvalidCiphertext!";
     std::string decrypted_text;
-
     ASSERT_FALSE(ChrxDecrypt(decrypted_text, incorrect_ciphertext));
 }
 
 TEST(ChrxEncryptDecryptTest, EncryptEmptyPlaintext) {
     std::string plaintext = "";
     std::string encrypted_text;
-
+    
     ASSERT_TRUE(ChrxEncrypt(plaintext, encrypted_text));
-
     ASSERT_TRUE(encrypted_text.empty());
 }
 

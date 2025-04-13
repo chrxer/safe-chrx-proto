@@ -2,30 +2,19 @@
 #include "chrx_server.h"
 #include "base/logging.h"
 
-class CryptServerLauncherTest : public ::testing::Test {
-protected:
-    void SetUp() override {
-        // Nothing needed here yet — the singleton will initialize on access.
-    }
-
-    void TearDown() override {
-        // Normally you'd want to clean up, but since this is a singleton, we assume one-time init.
-    }
-};
-
-TEST_F(CryptServerLauncherTest, GetPortReturnsValidPort) {
+TEST_F(CryptServerLauncher, GetPortReturnsValidPort) {
     int port = CryptServerLauncher::Instance().GetPort();
     EXPECT_GT(port, 0) << "Port should be greater than zero.";
     EXPECT_LT(port, 65536) << "Port should be a valid TCP port.";
 }
 
-TEST_F(CryptServerLauncherTest, GetKeyReturnsNonEmptyKey) {
+TEST_F(CryptServerLauncher, GetKeyReturnsNonEmptyKey) {
     const std::string& key = CryptServerLauncher::Instance().GetKey();
     EXPECT_FALSE(key.empty()) << "AES key should not be empty.";
     EXPECT_GT(key.length(), 8u) << "AES key should be reasonably long.";
 }
 
-TEST_F(CryptServerLauncherTest, GetPortAndGetKeyConsistency) {
+TEST_F(CryptServerLauncher, GetPortAndGetKeyConsistency) {
     auto& launcher = CryptServerLauncher::Instance();
     int port1 = launcher.GetPort();
     int port2 = launcher.GetPort();

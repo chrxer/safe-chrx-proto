@@ -2,8 +2,9 @@
 #include <vector>
 #include <string>
 
+// runs Gtests whilst ensuring --no-headless is always applied
+
 int main(int argc, char** argv) {
-  // Create a modifiable copy of arguments
   std::vector<std::string> args(argv, argv + argc);
 
   // Check if --no-headless exists
@@ -20,10 +21,9 @@ int main(int argc, char** argv) {
     args.push_back("--no-headless");
   }
 
-  // Prepare arguments for InitGoogleTest
   std::vector<char*> arg_ptrs;
   for (auto& arg : args) {
-    arg_ptrs.push_back(&arg[0]);  // Get pointer to string data
+    arg_ptrs.push_back(&arg[0]);
   }
   int new_argc = static_cast<int>(arg_ptrs.size());
 

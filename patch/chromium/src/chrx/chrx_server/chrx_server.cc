@@ -84,7 +84,7 @@ bool CryptServerLauncher::LaunchChild() {
   options.kill_on_parent_death = true;
   options.new_process_group = true;
 
-#if defined(OS_WIN)
+#if defined(OS_WIN) // not tested yet
   HANDLE stdin_read, stdin_write;
   HANDLE stdout_read, stdout_write;
   SECURITY_ATTRIBUTES sa = {sizeof(SECURITY_ATTRIBUTES), NULL, TRUE};

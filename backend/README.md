@@ -7,10 +7,10 @@ Usage of ./chrxCryptServer:
   -reset
         Reset the password. All currently encrypted data will be lost
 ```
-A AES265 key has to be passed base64 encoded to the server over `stdin`
+A AES265 key has to be passed base64 encoded to the server over `stdin`, terminated with `\n`.
 
+For testing the server in golang
 ```
-Usage of ./serverTest:
 Usage of ./serverTest:
   -conn-key string
         (optional) base64 encoded 256bit AES connection key for testing. Won't start server process if provided.

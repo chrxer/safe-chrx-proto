@@ -13,7 +13,7 @@ build:
 	scripts/build.py && scripts/pack.py
 
 test:
-	scripts/autotest.py os_crypt_hook_unittest.cc
+	scripts/autotest.py chrx/os_crypt_hook/os_crypt_hook_unittest.cc
 
 clean:
 	scripts/clean.py

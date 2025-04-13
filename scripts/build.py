@@ -3,6 +3,7 @@
 import sys
 import datetime
 import shutil
+import os
 
 from utils import ccache_, DEPOT_TOOLS, OUT, SRC, mkargs, GOOGLEPYTHON, GOOGLEENV, WRK
 from utils.wrap import pyexc, exc
@@ -29,9 +30,8 @@ def build_server(outdir:str):
     out_dir = SRC.joinpath(outdir)
     exec_name="chrxCryptServer"
     exc("go", "build", exec_name, cwd=build_dir)
+    os.makedirs(out_dir, exist_ok=True)
     shutil.copy2(build_dir.joinpath(exec_name), out_dir.joinpath(exec_name))
-
-
 
 def build(target:str="chrome",debug:bool=False):
     if debug:

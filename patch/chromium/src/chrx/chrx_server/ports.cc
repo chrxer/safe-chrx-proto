@@ -1,6 +1,6 @@
 #include "ports.h"
 
-#if defined(OS_WIN)
+#if defined(OS_WIN) // not tested
 #include <windows.h>
 #else
 // linux//UNIX
@@ -10,8 +10,10 @@
 #include <arpa/inet.h>
 #endif
 
+// find a free port to open socket on
+// returns 0 if failed
 int findFreePort() {
-    #if defined(OS_WIN)
+    #if defined(OS_WIN) // not tested
         WSADATA wsaData;
         if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
             return 0;

@@ -36,6 +36,7 @@ var myWindow fyne.Window
 /* SERVER ENDPOINT */
 
 func handleRequestWithRecovery(w http.ResponseWriter, r *http.Request, handler func(http.ResponseWriter, *http.Request)) {
+	// ensure any errors within request handler result in http.StatusInternalServerError
 	defer func() {
 		if err := recover(); err != nil {
 			log.Println("Recovered from panic inside server:", err)
@@ -45,6 +46,7 @@ func handleRequestWithRecovery(w http.ResponseWriter, r *http.Request, handler f
 	handler(w, r)
 }
 
+// http://localhost/{port}/
 func getRoot(w http.ResponseWriter, is_locked bool) {
 	var response string;
 	response = "See https://github.com/chrxer/safe-chrx-proto/tree/main/backend/server\n"
@@ -56,6 +58,9 @@ func getRoot(w http.ResponseWriter, is_locked bool) {
 	io.WriteString(w, response)
 }
 
+// http://localhost/{port}/encrypt
+// expects data encrypted with shared aes key from secured connection
+// returns data encrypted with same key
 func handleEncrypt(w http.ResponseWriter, r *http.Request, key []byte) {
 	if !isPost(w, r) {
 		return
@@ -80,6 +85,9 @@ func handleEncrypt(w http.ResponseWriter, r *http.Request, key []byte) {
 	log.Println("written response")
 }
 
+// http://localhost/{port}/decrypt
+// expects data encrypted with shared aes key fro secured connection
+// returns data encrypted with same key
 func handleDecrypt(w http.ResponseWriter, r *http.Request, key []byte) {
 	if !isPost(w, r) {
 		return
@@ -103,6 +111,8 @@ func handleDecrypt(w http.ResponseWriter, r *http.Request, key []byte) {
 	w.Write(decrypted)
 }
 
+
+// ensure request is POST
 func isPost(w http.ResponseWriter, r *http.Request) bool {
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -112,6 +122,8 @@ func isPost(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
+
+// start serving
 func serve(port int, key []byte) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		handleRequestWithRecovery(w, r, func(w http.ResponseWriter, r *http.Request) {
@@ -150,12 +162,14 @@ func main() {
 	if err != nil {
 		log.Fatal("Could not create temporary log file", err)
 	}
+	// commented out since fmt:Print* blocks if stdout buffer is full (potentially happens inside chromium)
+	// => always log to file
+	// go fmt.Printf("Logging to file at :\"%s\"\n", tmpFile.Name())
 	log.SetOutput(tmpFile)
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
-	// go fmt.Printf("Logging to file at :\"%s\"\n", tmpFile.Name())
 
 	var port *int
-	// Ensure cleanup on exit
+	// Ensure eny error from this point on is logged
 	defer func() {
 		log.Printf("Exiting (port: %d)\n", *port)
 		if r := recover(); r != nil {
@@ -168,7 +182,7 @@ func main() {
 		tmpFile.Close()
 	}()
 
-	// CLI flags
+	// parse cmd
 	port = flag.Int("port", 3333, "port to serve on")
 	reset := flag.Bool("reset", false, "Reset the password. All currently encrypted data will be lost")
 	flag.Parse()
@@ -178,29 +192,24 @@ func main() {
 		return
 	}
 
-	// syscall.Environ()
-	log.Println("Logging environ next")
-	for _, e := range os.Environ() {
-        log.Println(e)
-    }
 
+	// for secured connection
+	// assumes that stdin is 100% secure channel
 	key := readAESKeyFromStdin()
 
+	// native gui app//driver initialization
 	myApp = app.New()
 	drv := myApp.Driver()
 
 	log.Printf("Started on %d\n",*port)
 
 	if drv, ok := drv.(desktop.Driver); ok {
-		log.Println("Created driver")
 		myWindow = drv.CreateSplashWindow()
-		log.Println("Created splash window")
 		// Hide instead of close -> Closing stops the entire program
 		myWindow.SetCloseIntercept(func() {
 			wg.Done() // See getMasterPassword() in crypt.go
 			myWindow.Hide()
 		})
-		log.Println("set close intercept")
 
 		var content *fyne.Container
 
@@ -210,21 +219,14 @@ func main() {
 		} else {
 			content = createPswdQueryWindow()
 		}
-		log.Println("checked if password is set")
 		myWindow.SetContent(container.NewPadded(content))
-		log.Println("set window content")
 		myWindow.Resize(content.Size())
-		log.Println("set window size")
 	} else {
 		panic("Failed to create splash window")
 	}
 
-	log.Println("Started driver")
-
 	go serve(*port, key)
-	log.Println("Started serving")
 	myWindow.Hide()
-	log.Println("Running app")
 	myApp.Run() // Due to being hidden it runs in the background
 }
 

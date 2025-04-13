@@ -24,11 +24,8 @@ func encrypt(b []byte, mP []byte) []byte {
 		return []byte("")
 	}
 	if len(mP) == 0{
-		log.Println("requesting master passw")
 		mP = getMasterPassword()
 	}
-
-	log.Println("creating cypher")
 	
 	// Create a new Cipher Block from the key
 	block, err := aes.NewCipher(mP)
@@ -94,9 +91,8 @@ func getMasterPassword() []byte {
 		// In case the user attempts closing the window
 		for(len(userPassword) == 0) {
 			wg.Add(1)
-			log.Println("show window")
 			myWindow.Show()
-			log.Println("waiting for user interaction..")
+			log.Println("waiting for user to enter password..")
 			wg.Wait() // wg.Done() is run on Main() on correct password given or if the window is closed (=> reason for the for loop)
 		}
 		masterKey = NewSHA256([]byte(userPassword))
@@ -105,6 +101,7 @@ func getMasterPassword() []byte {
 }
 
 func NewSHA256(data []byte) []byte {
+	// fast hash (but not as safe) as argon2
 	hash := sha256.Sum256(data)
 	return hash[:]
 }
@@ -112,6 +109,7 @@ func NewSHA256(data []byte) []byte {
 /* ARGON2ID */
 
 func argonHash(pswd string) string {
+	// safer regarding brute force (but slower) than sha
 	hash, err := argon2id.CreateHash(pswd, argon2id.DefaultParams)
 	if err != nil {
 		panic(err.Error())
@@ -120,6 +118,7 @@ func argonHash(pswd string) string {
 }
 
 func argonCheckPswd(pswd string, hash string) bool {
+	// validate password based on argon2id hash
 	match, err := argon2id.ComparePasswordAndHash(pswd, hash)
 	if err != nil {
 		panic(err.Error())
@@ -130,6 +129,7 @@ func argonCheckPswd(pswd string, hash string) bool {
 /* FILE (password) read & write */
 
 func getHashFile() string {
+	// get file path where argon2 hash is stored
     dirs := appdir.New("chrx-safe-proto")
 	p := dirs.UserConfig()
 	if err := os.MkdirAll(p, 0700); err != nil {
@@ -149,7 +149,7 @@ func getHashFile() string {
 }
 
 func fetchHash() string {
-	
+	// read argon2id hash from disk
 	hashf:=getHashFile()
 	dat, err := os.ReadFile(hashf)
 	if err != nil {
@@ -159,6 +159,7 @@ func fetchHash() string {
 }
 
 func writeHash(hash string) {
+	// write argon2id hash to disk
 	data := []byte(hash)
     err := os.WriteFile(getHashFile(), data, 0600)
     if err != nil {
@@ -196,6 +197,5 @@ func readAESKeyFromStdin() []byte {
         return key
     case <-time.After(5 * time.Second):
         panic("Timed out waiting for AES key input")
-		panic("")
     }
 }

@@ -43,7 +43,7 @@ bool ChrxSendRequest(const std::string& endpoint, const std::string& input, std:
   // Convert encrypted vector back to string for sending
   std::string encrypted_input(encrypted_vec.begin(), encrypted_vec.end());
 
-  // Retry mechanism
+  // Retry for maximum 10 min 60 times
   const int max_retries = 60;
   const int retry_interval_ms = 500;
   int retries = 0;
@@ -53,33 +53,30 @@ bool ChrxSendRequest(const std::string& endpoint, const std::string& input, std:
 
       if (response) {
           if (response->status == 200) {
-              // Convert response to vector for decryption
+              // response to vector for decryption
               ByteVector response_vec(response->body.begin(), response->body.end());
               ByteVector output_vec;
 
-              // Decrypt the response
               if (!DecryptAESGCM(response_vec, key_vec, output_vec)) {
                   LOG(ERROR) << "DecryptAESGCM failed";
                   return false;
               }
 
-              // Convert decrypted vector back to string
+              // decrypted vector back to string
               output.assign(output_vec.begin(), output_vec.end());
               return true;
           } else {
               LOG(ERROR) << "Received HTTP status: " << response->status;
-              return false;  // Exit early if server responded but with an error
+              return false;
           }
       }
 
-      // Retry logic
       retries++;
       LOG(INFO) << "Retrying... attempt " << retries << " of " << max_retries;
       std::this_thread::sleep_for(std::chrono::milliseconds(retry_interval_ms));
   }
 
-  LOG(ERROR) << "No response received from server after " << max_retries << " retries. Server process exit code (-1 if running): " << launcher.GetExitCode();
-  return false;
+  LOG(FATAL) << "No response received from server after " << max_retries << " retries. Server process exit code (-1 if running): " << launcher.GetExitCode();
 }
 
 
