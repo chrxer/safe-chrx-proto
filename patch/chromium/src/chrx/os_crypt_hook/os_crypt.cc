@@ -12,18 +12,22 @@
 using ByteVector = std::vector<uint8_t>;
 
 bool ChrxSendRequest(const std::string& endpoint, const std::string& input, std::string& output) {
+  if (input.empty()) {
+    output.clear();
+    return true;
+  }
+
   // Get server port and key from the launcher
   auto& launcher = CryptServerLauncher::Instance();
   int port = launcher.GetPort();
   const std::string& key = launcher.GetKey();
 
   std::string url = "http://localhost:" + std::to_string(port);
-  LOG(INFO) << "sending request to: " << url << endpoint;
 
   httplib::Client client(url);
-  client.set_connection_timeout(1);
-  client.set_read_timeout(1);
-  client.set_write_timeout(1);
+  client.set_connection_timeout(10);
+  client.set_read_timeout(10);
+  client.set_write_timeout(10);
 
   // Convert strings to byte vectors
   ByteVector input_vec(input.begin(), input.end());
@@ -40,11 +44,11 @@ bool ChrxSendRequest(const std::string& endpoint, const std::string& input, std:
   std::string encrypted_input(encrypted_vec.begin(), encrypted_vec.end());
 
   // Retry mechanism
-  const int max_duration_seconds = 20;
+  const int max_retries = 60;
   const int retry_interval_ms = 500;
-  auto start_time = std::chrono::steady_clock::now();
+  int retries = 0;
 
-  while (std::chrono::steady_clock::now() - start_time < std::chrono::seconds(max_duration_seconds)) {
+  while (retries < max_retries) {
       auto response = client.Post(endpoint.c_str(), encrypted_input, "application/octet-stream");
 
       if (response) {
@@ -68,26 +72,21 @@ bool ChrxSendRequest(const std::string& endpoint, const std::string& input, std:
           }
       }
 
-      // Sleep a bit before retrying
+      // Retry logic
+      retries++;
+      LOG(INFO) << "Retrying... attempt " << retries << " of " << max_retries;
       std::this_thread::sleep_for(std::chrono::milliseconds(retry_interval_ms));
   }
 
-  LOG(ERROR) << "No response received from server after 20 seconds\n. Server process exit code (-1 if running): " << launcher.GetExitCode();
+  LOG(ERROR) << "No response received from server after " << max_retries << " retries. Server process exit code (-1 if running): " << launcher.GetExitCode();
   return false;
 }
 
+
 bool ChrxEncrypt(const std::string& plaintext, std::string& ciphertext) {
-    bool ok = ChrxSendRequest("/encrypt", plaintext, ciphertext);
-    if(!ok){
-      LOG(FATAL) << "ChrxSendRequest to /encrypt failed";
-    }
-    return ok;
+    return ChrxSendRequest("/encrypt", plaintext, ciphertext);
 }
 
 bool ChrxDecrypt(std::string& plaintext, const std::string& ciphertext) {
-    bool ok = ChrxSendRequest("/decrypt", ciphertext, plaintext);
-    if(!ok){
-      LOG(FATAL) << "ChrxSendRequest to /decrypt failed";
-    }
-    return ok;
+    return ChrxSendRequest("/decrypt", ciphertext, plaintext);
 }

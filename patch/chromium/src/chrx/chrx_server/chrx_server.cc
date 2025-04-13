@@ -66,7 +66,7 @@ int CryptServerLauncher::GetExitCode() {
 
 
 bool CryptServerLauncher::Start() {
-  if (started_) return true;
+  if (started_ && (!server_process_.IsValid() || server_process_.WaitForExitWithTimeout(base::Seconds(0), nullptr))) return true;
   return LaunchChild();
 }
 
@@ -81,6 +81,8 @@ bool CryptServerLauncher::LaunchChild() {
 
   base::LaunchOptions options;
   options.wait = false;
+  options.kill_on_parent_death = true;
+  options.new_process_group = true;
 
 #if defined(OS_WIN)
   HANDLE stdin_read, stdin_write;
@@ -107,6 +109,7 @@ bool CryptServerLauncher::LaunchChild() {
   options.fds_to_remap.emplace_back(stdin_pipe[0], STDIN_FILENO);
   options.fds_to_remap.emplace_back(stdout_pipe[1], STDOUT_FILENO);
   fcntl(parent_read.get(), F_SETFL, O_NONBLOCK);
+  fcntl(parent_write.get(), F_SETFL, O_NONBLOCK);
 #endif
 
   LOG(INFO) << "Starting process: " << cmd.GetCommandLineString();

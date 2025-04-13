@@ -9,12 +9,10 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/signal"
 	"path"
 	"runtime/debug"
 	"strconv"
 	"sync"
-	"syscall"
 	"unicode"
 
 	"fyne.io/fyne/v2"
@@ -36,6 +34,16 @@ var myApp fyne.App
 var myWindow fyne.Window
 
 /* SERVER ENDPOINT */
+
+func handleRequestWithRecovery(w http.ResponseWriter, r *http.Request, handler func(http.ResponseWriter, *http.Request)) {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("Recovered from panic inside server:", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+	}()
+	handler(w, r)
+}
 
 func getRoot(w http.ResponseWriter, is_locked bool) {
 	var response string;
@@ -65,9 +73,11 @@ func handleEncrypt(w http.ResponseWriter, r *http.Request, key []byte) {
 
 	var encrypted []byte
 	encrypted = encrypt(reqBody, []byte(""))
+	log.Println("encrypted plaintext")
 	encrypted = encrypt(encrypted, key)
-
+	log.Println("writing response")
 	w.Write(encrypted)
+	log.Println("written response")
 }
 
 func handleDecrypt(w http.ResponseWriter, r *http.Request, key []byte) {
@@ -103,28 +113,46 @@ func isPost(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func serve(port int, key []byte) {
-		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request){
-			getRoot(w,bytes.Equal(masterKey,[]byte("")))
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		handleRequestWithRecovery(w, r, func(w http.ResponseWriter, r *http.Request) {
+			getRoot(w, bytes.Equal(masterKey, []byte("")))
 		})
-		http.HandleFunc("/encrypt", func(w http.ResponseWriter, r *http.Request){handleEncrypt(w,r,key)})
-		http.HandleFunc("/decrypt", func(w http.ResponseWriter, r *http.Request){handleDecrypt(w,r,key)})
-		err := http.ListenAndServe("localhost:"+strconv.Itoa(port), nil)
-		if err != nil {
-			panic(err.Error())
-		}
+	})
+
+	http.HandleFunc("/encrypt", func(w http.ResponseWriter, r *http.Request) {
+		handleRequestWithRecovery(w, r, func(w http.ResponseWriter, r *http.Request) {
+			handleEncrypt(w, r, key)
+		})
+	})
+
+	http.HandleFunc("/decrypt", func(w http.ResponseWriter, r *http.Request) {
+		handleRequestWithRecovery(w, r, func(w http.ResponseWriter, r *http.Request) {
+			handleDecrypt(w, r, key)
+		})
+	})
+
+	log.Println("Starting serving now")
+	err := http.ListenAndServe("localhost:"+strconv.Itoa(port), nil)
+	if err != nil {
+		log.Println("Server failed to start:", err)
+		panic(err.Error())
 	}
+}
 
 /* MAIN */
 
+var tmpFile *os.File
+
 func main() {
 	// Set up logging file first
-	tmpFile, err := os.OpenFile(path.Join(os.TempDir(), "chrxCryptServerLog.log"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	var err error
+	tmpFile, err = os.OpenFile(path.Join(os.TempDir(), "chrxCryptServerLog.log"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatal("Could not create temporary log file", err)
 	}
 	log.SetOutput(tmpFile)
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
-	go fmt.Printf("Logging to file at :\"%s\"\n", tmpFile.Name())
+	// go fmt.Printf("Logging to file at :\"%s\"\n", tmpFile.Name())
 
 	var port *int
 	// Ensure cleanup on exit
@@ -133,18 +161,11 @@ func main() {
 		if r := recover(); r != nil {
 			s:= fmt.Sprintf("%s: %s", r, debug.Stack())
 			log.Println(s)
-			println(s)
+			tmpFile.Close()
+			go println(s)
 		}
 		
 		tmpFile.Close()
-	}()
-
-	// Catch OS signals
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		s := <-sigChan
-		log.Printf("Caught signal: %s, contintuing anyways\n", s)
 	}()
 
 	// CLI flags
@@ -156,7 +177,13 @@ func main() {
 		log.Printf("Password reset by user\n")
 		return
 	}
-	
+
+	// syscall.Environ()
+	log.Println("Logging environ next")
+	for _, e := range os.Environ() {
+        log.Println(e)
+    }
+
 	key := readAESKeyFromStdin()
 
 	myApp = app.New()
@@ -165,13 +192,15 @@ func main() {
 	log.Printf("Started on %d\n",*port)
 
 	if drv, ok := drv.(desktop.Driver); ok {
+		log.Println("Created driver")
 		myWindow = drv.CreateSplashWindow()
-
+		log.Println("Created splash window")
 		// Hide instead of close -> Closing stops the entire program
 		myWindow.SetCloseIntercept(func() {
 			wg.Done() // See getMasterPassword() in crypt.go
 			myWindow.Hide()
 		})
+		log.Println("set close intercept")
 
 		var content *fyne.Container
 
@@ -181,15 +210,21 @@ func main() {
 		} else {
 			content = createPswdQueryWindow()
 		}
+		log.Println("checked if password is set")
 		myWindow.SetContent(container.NewPadded(content))
+		log.Println("set window content")
 		myWindow.Resize(content.Size())
+		log.Println("set window size")
 	} else {
 		panic("Failed to create splash window")
 	}
 
-	go serve(*port, key)
+	log.Println("Started driver")
 
+	go serve(*port, key)
+	log.Println("Started serving")
 	myWindow.Hide()
+	log.Println("Running app")
 	myApp.Run() // Due to being hidden it runs in the background
 }
 

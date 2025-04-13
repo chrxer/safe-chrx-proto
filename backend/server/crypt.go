@@ -9,6 +9,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,8 +24,11 @@ func encrypt(b []byte, mP []byte) []byte {
 		return []byte("")
 	}
 	if len(mP) == 0{
+		log.Println("requesting master passw")
 		mP = getMasterPassword()
 	}
+
+	log.Println("creating cypher")
 	
 	// Create a new Cipher Block from the key
 	block, err := aes.NewCipher(mP)
@@ -90,7 +94,9 @@ func getMasterPassword() []byte {
 		// In case the user attempts closing the window
 		for(len(userPassword) == 0) {
 			wg.Add(1)
+			log.Println("show window")
 			myWindow.Show()
+			log.Println("waiting for user interaction..")
 			wg.Wait() // wg.Done() is run on Main() on correct password given or if the window is closed (=> reason for the for loop)
 		}
 		masterKey = NewSHA256([]byte(userPassword))
@@ -178,7 +184,7 @@ func readAESKeyFromStdin() []byte {
         }
         
         if len(key) != 32 {
-            panic(err.Error())
+            panic("Expected 256bit key")
         }
         
         result <- key

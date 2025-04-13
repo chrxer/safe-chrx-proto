@@ -15,7 +15,7 @@ source_set("chrx_server") {
   sources = [
     "chrx_server/chrx_server.cc",
     "chrx_server/chrx_server.h",
-    "chrx_server/ports.cc", 
+    "chrx_server/ports.cc",
     "chrx_server/ports.h",
   ]
   deps = [
@@ -46,6 +46,15 @@ source_set("chrx") {
 
 # Test targets below
 
+source_set("os_crypt_hook_unittest") {
+  testonly = true
+  sources = ["os_crypt_hook/os_crypt_hook_unittest.cc"]
+  deps = [
+    ":os_crypt_hook",
+    "//testing/gtest",
+  ]
+}
+
 source_set("aes_crypt_unittest") {
   testonly = true
   sources = ["aes_crypt/aes_crypt_unittest.cc"]
@@ -72,5 +81,14 @@ executable("chrx_unittest") {
     "//testing/gtest",
     ":aes_crypt_unittest",
     ":chrx_server_unittest",
+  ]
+}
+
+executable("chrx_headfull_unittest") {
+  testonly = true
+  sources = ["chrx_headfull_unittest.cc"]
+  deps = [
+    "//testing/gtest",
+    ":os_crypt_hook_unittest"
   ]
 }
