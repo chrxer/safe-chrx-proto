@@ -78,11 +78,8 @@ func handleEncrypt(w http.ResponseWriter, r *http.Request, key []byte) {
 
 	var encrypted []byte
 	encrypted = encrypt(reqBody, []byte(""))
-	log.Println("encrypted plaintext")
 	encrypted = encrypt(encrypted, key)
-	log.Println("writing response")
 	w.Write(encrypted)
-	log.Println("written response")
 }
 
 // http://localhost/{port}/decrypt
@@ -188,8 +185,10 @@ func main() {
 	flag.Parse()
 	if *reset {
 		writeHash("")
-		log.Printf("Password reset by user\n")
-		return
+		s:="Password reset"
+		log.Println(s)
+		fmt.Println(s)
+		os.Exit(0)
 	}
 
 
