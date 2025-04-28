@@ -1,7 +1,7 @@
 from ptcx import BasePTC
 from sourcetypes import cc
     
-
+# match location after all first commetns
 after_first_comments = rb'^(\s*(?://.*\n|/\*[^*]*\*+(?:[^/*][^*]*\*+)*/\s*\n?)+\s*)\n|^'
 
 add: cc = b"""
