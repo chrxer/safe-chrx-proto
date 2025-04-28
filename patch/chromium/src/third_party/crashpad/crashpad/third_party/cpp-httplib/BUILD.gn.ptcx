@@ -1,9 +1,12 @@
 from ptcx import BasePTC
 
 def comment(matched_text:bytes) -> bytes:
+    # return commented line
     return b'# ' + matched_text + b" # commented by chrx"
 
 
 class PTC(BasePTC):
     def patch(self):
+        # find testonly\s*=\s*true line
+        # comment that line
         self.insert(rb'^\s*(testonly\s*=\s*true)', comment)
