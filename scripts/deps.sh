@@ -42,6 +42,8 @@ asu() {
     sudo env "PATH=$PATH" "$@"
 }
 
+asu "$WRK/backend/deps.sh"
+
 nsu python3 -m venv scripts/.venv
 nsu python3 -m venv scripts/.googlevenv
 

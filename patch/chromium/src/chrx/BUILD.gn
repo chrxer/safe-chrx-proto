@@ -1,10 +1,96 @@
-source_set("os_crypt_hook") {
-  # testonly = true # chrxer commented
-  include_dirs = [ "os_crypt_hook" ]
-  sources = [ "os_crypt_hook/os_crypt.cc" ]
-  deps = ["//third_party/crashpad/crashpad/third_party/cpp-httplib"]
+source_set("aes_crypt") {
+  include_dirs = ["aes_crypt"]
+  sources = [
+    "aes_crypt/aes_crypt.cc",
+    "aes_crypt/aes_crypt.h"
+  ]
+  deps = [
+    "//base",
+    "//third_party/boringssl",
+  ]
 }
 
-shared_library("chrx"){
-  deps=["//chrx:os_crypt_hook"]
+source_set("chrx_server") {
+  include_dirs = ["chrx_server"]
+  sources = [
+    "chrx_server/chrx_server.cc",
+    "chrx_server/chrx_server.h",
+    "chrx_server/ports.cc",
+    "chrx_server/ports.h",
+  ]
+  deps = [
+    "//base",
+    ":aes_crypt"
+  ]
+}
+
+source_set("os_crypt_hook") {
+  include_dirs = ["os_crypt_hook"]
+  sources = [
+        "os_crypt_hook/os_crypt.cc",
+        "os_crypt_hook/os_crypt.h"
+      ]
+  deps = [
+    "//base",
+    "//third_party/crashpad/crashpad/third_party/cpp-httplib",
+    ":aes_crypt",
+    ":chrx_server"
+  ]
+}
+
+source_set("chrx") {
+  deps = [
+    ":os_crypt_hook"
+  ]
+}
+
+# Test targets below
+
+source_set("os_crypt_hook_unittest") {
+  testonly = true
+  sources = ["os_crypt_hook/os_crypt_hook_unittest.cc"]
+  deps = [
+    ":os_crypt_hook",
+    "//testing/gtest",
+  ]
+}
+
+source_set("aes_crypt_unittest") {
+  testonly = true
+  sources = ["aes_crypt/aes_crypt_unittest.cc"]
+  deps = [
+    ":aes_crypt",
+    "//testing/gtest",
+  ]
+}
+
+source_set("chrx_server_unittest") {
+  testonly = true
+  sources = ["chrx_server/chrx_server_unittest.cc"]
+  deps = [
+    "//testing/gtest",
+    "//base",
+    ":chrx_server"
+  ]
+}
+
+executable("chrx_unittest") {
+  testonly = true
+  sources = ["chrx_unittest.cc"]
+  deps = [
+    "//testing/gtest",
+    ":aes_crypt_unittest",
+    ":chrx_server_unittest",
+  ]
+}
+
+# Tests which are meant to run with GUI need a different setup
+
+executable("chrx_headfull_unittest") {
+  testonly = true
+  sources = ["chrx_headfull_unittest.cc"]
+  deps = [
+    "//testing/gtest",
+    ":os_crypt_hook_unittest"
+  ]
 }
