@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# currently not used, can be ignored
+
 set +e
 LOGFILE="/tmp/build.log"
 USER=$(awk -F: '$3 >= 1000 && $3 < 60000 {print $1; exit}' /etc/passwd)
