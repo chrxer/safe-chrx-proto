@@ -19,9 +19,9 @@ SRC=WRK.joinpath("chromium/src")
 
 DEPOT_TOOLS=WRK.joinpath("depot_tools")
 
-VENVBIN=WRK.joinpath("scripts/.venv/bin")
+VENVBIN=WRK.joinpath("scripts/.googlevenv/bin")
 if not IS_LINUX:
-    VENVBIN=WRK.joinpath("scripts/.venv/SCRIPTS")
+    VENVBIN=WRK.joinpath("scripts/.googlevenv/Scripts")
 
 sys.path.insert(0, DEPOT_TOOLS)
 os.environ["PATH"] = str(DEPOT_TOOLS) + os.pathsep + os.environ["PATH"]

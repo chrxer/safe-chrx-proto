@@ -2,64 +2,169 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
+	"flag"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"strconv"
+	"syscall"
+	"time"
 )
 
-const url = "http://localhost:3333/"
-
-func _req(s []byte, endpoint string) []byte {
-	endpoint_url := url + endpoint
+func _req(s []byte, port int, endpoint string) []byte {
+	endpoint_url := "http://localhost:" + strconv.Itoa(port) + "/" + endpoint
 	
-	req, err := http.NewRequest(http.MethodPost, endpoint_url, bytes.NewBuffer(s))
-	if err != nil {
-		fmt.Printf("%s", err.Error())
-		return []byte("")
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Printf("%s", err.Error())
-		return []byte("")
-	}
-	fmt.Printf("%v", resp.StatusCode)
-	defer resp.Body.Close()
-
-	//fmt.Printf("\n%s\n", resp.Body)
-
-	if resp.StatusCode != 200 {
-		fmt.Printf("Excpected status code 200, but got: %s", strconv.Itoa(resp.StatusCode))
-		return []byte("")
+	client := &http.Client{
+		Timeout: 60 * time.Second,
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Printf("%s", err.Error())
-		return []byte("")
+	// Try for maximum 10 s
+	start := time.Now()
+	var resp *http.Response
+	for time.Since(start).Seconds() < 60 {
+		req, err := http.NewRequest(http.MethodPost, endpoint_url, bytes.NewBuffer(s))
+		if err != nil {
+			fmt.Printf("%s", err.Error())
+			return []byte("")
+		}
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err = client.Do(req)
+		if err == nil && resp.StatusCode == 200 {
+			defer resp.Body.Close()
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				fmt.Printf("%s", err.Error())
+				return []byte("")
+			}
+			return body
+		}
+
+		time.Sleep(100 * time.Millisecond)
 	}
 
-	fmt.Printf("Body: %v\n", body)
-
-	return body
+	fmt.Printf("Failed to connect within 60 seconds\n")
+	return []byte("")
 }
 
-func encrypt(s []byte) []byte {
-	return _req(s, "encrypt")
+func serverEncrypt(s []byte,port int, connKey []byte) []byte {
+	// encrypt over chrxCryptServer
+	s = encrypt(s, connKey)
+	res:= _req(s, port,"encrypt")
+	return decrypt(res, connKey)
 }
 
-func decrypt(s []byte) []byte {
-	return _req(s, "decrypt")
+func serverDecrypt(s []byte, port int, connKey []byte) []byte {
+	// decrypt over chrxCryptServer
+	s = encrypt(s, connKey)
+	res:=_req(s, port, "decrypt")
+	return decrypt(res, connKey)
 }
 
 func main() {
-	data := []byte("password")
-	encrypted := encrypt(data)
-	fmt.Printf("\nData: %v\nEncrypted: %v\n", data, encrypted)
-	decrypted := decrypt(encrypted)
+	port:= flag.Int("port", 3333, "port on which server runs")
+	var serverPath = flag.String("server", "", "(optional) Path to server executable")
+	connBase64Key:=flag.String("conn-key", "", "(optional) base64 encoded 256bit AES connection key for testing. Won't start server process if provided.")
+	flag.Parse()
 
-	fmt.Printf("\nData: %s\nEncrypted: %s\nDecrypted: %s", data, encrypted, decrypted)
+	// pass connection encryption key to server
+	var connKey []byte = []byte("")
+	if len(*connBase64Key) != 0{
+		connKey, _ = base64.StdEncoding.DecodeString(*connBase64Key)
+	}
+	if len(connKey) == 0{
+		connKey = randKey()
+	}
+	
+	encodedKey := base64.StdEncoding.EncodeToString(connKey)
+
+	// start the server
+	if len(*serverPath) == 0 {
+		executablePath, err := os.Executable()
+		if err != nil {
+			fmt.Printf("Error getting executable path: %v\n", err)
+			return
+		}
+		p := filepath.Join(filepath.Dir(executablePath), "server", "chrxCryptServer")
+		serverPath = &p
+	}
+	
+	var cmd *exec.Cmd
+	if len(*connBase64Key) == 0 {
+		cmd = exec.Command(*serverPath, fmt.Sprintf("--port=%d", *port))
+		cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true} // Ensure process can be killed by signal
+		stdin, err := cmd.StdinPipe()
+		if err != nil {
+			fmt.Printf("Error setting up stdin pipe: %v\n", err)
+			return
+		}
+		stdoutPipe, err := cmd.StdoutPipe()
+		if err != nil {
+			log.Fatalf("Error setting up stdout pipe: %v\n", err)
+		}
+		stderrPipe, err := cmd.StderrPipe()
+		if err != nil {
+			log.Fatalf("Error setting up stderr pipe: %v\n", err)
+		}
+		
+		err = cmd.Start()
+		if err != nil {
+			fmt.Printf("Error starting server: %v\n", err)
+			return
+		}
+
+		_, err = stdin.Write([]byte(encodedKey + "\n"))
+		if err != nil {
+			// Print and return error
+			fmt.Println("Error writing to stdin:", err)
+			if err := cmd.Process.Kill(); err != nil {
+				fmt.Printf("Error killing server: %v\n", err)
+			}
+		}
+		fmt.Printf("%s\n", encodedKey)
+
+		// stream stdout & stderr from server to stdout for debugging
+		go logOutput(stdoutPipe, "stdout")
+		go logOutput(stderrPipe, "stderr")
+	}
+	
+	
+	// test encryption & decryption
+	data := []byte("password")
+	var decrypted = []byte("")
+	var encrypted = []byte("")
+	encrypted = serverEncrypt(data, *port, connKey)
+	fmt.Printf("\nPlaintext: %s\nEncrypted (hex): %x \nEncrypted: \"%s\"\n", data, encrypted,encrypted)
+	serverDecrypt(encrypted, *port, connKey)
+	serverDecrypt(encrypted, *port, connKey)
+	decrypted = serverDecrypt(encrypted,*port, connKey)
+
+	fmt.Printf("Decrypted: %s\n\n", decrypted)
+
+	// kill server
+	if len(*connBase64Key) == 0 {
+		if err := cmd.Process.Kill(); err != nil {
+		fmt.Printf("Error killing server: %v\n", err)
+		}
+	}
+}
+
+func logOutput(reader io.Reader, outputType string) {
+	// stream io.Reader to stdout
+	buf := make([]byte, 1024)
+	for {
+		n, err := reader.Read(buf)
+		if err != nil {
+			if err != io.EOF {
+				log.Printf("Error reading from %s: %v\n", outputType, err)
+			}
+			return
+		}
+		fmt.Printf("chrxCryptServer: %s", string(buf[:n]))
+	}
 }

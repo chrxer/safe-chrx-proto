@@ -1,7 +1,5 @@
 {
 	"files.exclude": {
-		"${workspaceFolder}/chromium/src/":true,
-		"${workspaceFolder}/build/*":true
 	},
 	"python.analysis.extraPaths":[
 		"${workspaceFolder}/depot_tools",

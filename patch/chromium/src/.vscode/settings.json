@@ -37,7 +37,7 @@
   },
   "files.exclude": {
     // Ignore build output folders.
-    "out*/**": true
+    //"out*/**": true
   },
   "files.watcherExclude": {
     // Don't watch out*/ and third_party/ for changes to fix an issue
@@ -46,8 +46,8 @@
     // There is currently another issue that requires a leading **/ for
     // watcherExlude. Beware that this pattern might affect other out* folders
     // like src/cc/output/.
-    "**/out*/**": true,
-    "**/third_party/**": true
+    "out*/**": true,
+    //"**/third_party/**": true
   },
   // C++ clang format settings. |workspaceFolder| is assumed to be Chromium's
   // src/ directory.
@@ -58,8 +58,8 @@
   "C_Cpp.files.exclude": {
     "**/.vscode": true,
     "**/.vs": true,
-    "./**":true, // minimize CPU usage
-    "components/os_crypt/**":false // whitelist
+    "out/**":true, // minimize CPU usage
+    //"components/os_crypt/**":false // whitelist
   },
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "modifications",

@@ -7,4 +7,4 @@ orjson
 pyjson5
 
 sourcetypes3
-ptcx>=0.0.7
+ptcx>=0.0.8

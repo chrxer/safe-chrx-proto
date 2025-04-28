@@ -12,7 +12,7 @@ def pack_build():
     
     BUILD.mkdir(parents=True, exist_ok=True)
     
-    for pattern in ["chrome","chrome_*.pak", "resources.pak", "icudtl.dat", "chrome_crashpad_handler", "*snapshot*.bin", "lib*.so", "lib*.so.1", "locales/*.pak"]:
+    for pattern in ["chrome","chrome_*.pak", "resources.pak", "icudtl.dat", "chrome_crashpad_handler", "*snapshot*.bin", "lib*.so", "lib*.so.1", "locales/*.pak", "chrxCryptServer", "chrxCryptServer.exe"]:
         for file in RELEASE.glob(pattern):
             target_file = BUILD.joinpath(file.relative_to(RELEASE))
             if file.is_file() or file.is_symlink():

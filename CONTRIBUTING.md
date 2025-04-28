@@ -58,6 +58,12 @@ scripts/diff.py
 
 The diff for modified files can currently be found at [os_crypt.patch](os_crypt.patch) and added files (tree-preserving) at [patch](patch/)
 
+## Running tests
+Example test:
+```bash
+scripts/autotest.py chrx/os_crypt_hook/os_crypt_hook_unittest.cc
+```
+
 ## Building on debian Live USB
 
 On less than 32GB RAM, the build might fail due to OOM (Out-of-memory) and freeze the OS.
