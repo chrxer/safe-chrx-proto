@@ -11,4 +11,5 @@ git diff --diff-filter=MD  > ../../os_crypt.patch
 
 class PTC(BasePTC):
     def patch(self):
+        # Prepends "add"
         self.bytes = add+self.bytes

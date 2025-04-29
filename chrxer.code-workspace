@@ -1,56 +1,53 @@
 {
-	"folders": [
-		{
-			"name": "chrxer",
-			"path": "."
-		},
-		{
-			"name": "chromium",
-			"path": "chromium/src"
-		},
-		
-		{
-			"name": "backend",
-			"path": "backend"
-		},
-		
-	],
-	"settings": {
-		"files.exclude": {
-			"**/.git": false,
-		},
-		"search.exclude": {
-			"**/node_modules": true,
-			"**/bower_components": true,
-			"**/*.code-search": true,
-			"**/site-packages/*":true
-		},
-		"problems.decorations.enabled": false,
-		"problems.autoReveal": false,
-		"python.pipenvPath":"${workspaceFolder}/scripts/.venv",
-		"terminal.integrated.env.linux": {
-			"PATH": "${workspaceFolder}/scripts/.venv/bin:${workspaceFolder}/depot_tools:${workspaceFolder}/../../scripts/.venv/bin:${workspaceFolder}/../../depot_tools:${env:PATH}:/usr/local/go/bin"
-		},
-		"terminal.integrated.env.windows": {
-			"PATH": "${workspaceFolder}\\scripts\\.venv\\Scripts;${workspaceFolder}\\depot_tools;${workspaceFolder}\\..\\..\\scripts\\.venv\\Scripts;${workspaceFolder}\\..\\..\\depot_tools;${env:PATH}"
-		},
-		"git.repositoryScanIgnoredFolders": [
-			"node_modules",
-			"chromium/src"
-		], 
-		"files.associations": {
-			"*.ptcx":"python"
-		},
-	},
-	"extensions": {
-		"recommendations": [
-			"golang.go",
-			"google.cros-ide",
-			"ms-vscode.cpptools",
-			"ms-python.python",
-			"ms-python.debugpy",
-			"google.vscode-mojom"
-		],
-		"unwantedRecommendations": ["twxs.cmake"]
-	}
+  "folders": [
+    {
+      "name": "chrxer",
+      "path": "."
+    },
+    {
+      "name": "chromium",
+      "path": "chromium/src"
+    },
+
+    {
+      "name": "backend",
+      "path": "backend"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.git": false
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/bower_components": true,
+      "**/*.code-search": true,
+      "**/site-packages/*": true
+    },
+    "problems.decorations.enabled": false,
+    "problems.autoReveal": false,
+    "python.pipenvPath": "${workspaceFolder}/scripts/.venv",
+    "terminal.integrated.env.linux": {
+      "PATH": "${workspaceFolder}/scripts/.venv/bin:${workspaceFolder}/depot_tools:${workspaceFolder}/../../scripts/.venv/bin:${workspaceFolder}/../../depot_tools:${env:PATH}:/usr/local/go/bin"
+    },
+    "terminal.integrated.env.windows": {
+      "PATH": "${workspaceFolder}\\scripts\\.venv\\Scripts;${workspaceFolder}\\depot_tools;${workspaceFolder}\\..\\..\\scripts\\.venv\\Scripts;${workspaceFolder}\\..\\..\\depot_tools;${env:PATH}"
+    },
+    "git.repositoryScanIgnoredFolders": ["node_modules", "chromium/src"],
+    "files.associations": {
+      "*.ptcx": "python"
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "golang.go",
+      "google.cros-ide",
+      "ms-vscode.cpptools",
+      "ms-python.python",
+      "ms-python.debugpy",
+      "google.vscode-mojom",
+      "chrx.python-inline-3"
+    ],
+    "unwantedRecommendations": ["twxs.cmake"]
+  }
 }
