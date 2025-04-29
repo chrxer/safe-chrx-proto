@@ -85,7 +85,6 @@ executable("chrx_unittest") {
 }
 
 # Tests which are meant to run with GUI need a different setup
-
 executable("chrx_headfull_unittest") {
   testonly = true
   sources = ["chrx_headfull_unittest.cc"]

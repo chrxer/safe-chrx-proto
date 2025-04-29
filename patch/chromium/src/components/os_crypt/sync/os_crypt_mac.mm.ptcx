@@ -2,5 +2,6 @@ from pathlib import Path
 from ptcx.utils.imprt import fileimport
 from ptcx import BasePTC
 
+# apply same patch as to os_crypt_linux.cc
 mod = fileimport(Path(__file__).parent.joinpath("os_crypt_linux.cc.ptcx"))
 PTC:BasePTC=mod.PTC

@@ -34,6 +34,10 @@ bool OSCryptImpl::DecryptString(const std::string& ciphertext, std::string* plai
 class PTC(BasePTC):
     def patch(self):
         self.lang = "cpp" # ensure this is always treated as c++
+
+        # add import
         self.insert(after_first_comments, lambda s: s + add)
+
+        # replace encrypt & decrypt
         self.rplace_fn(encrypt)
         self.rplace_fn(decrypt)

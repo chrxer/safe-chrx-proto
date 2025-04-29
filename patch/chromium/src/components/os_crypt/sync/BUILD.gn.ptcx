@@ -9,4 +9,3 @@ class PTC(BasePTC):
     def patch(self):
         # add "//chrx:chrx" dependency to chromium\src\components\os_crypt\sync\BUILD.gn
         self.insert(pattern, lambda s:array_add(s, deps_to_add))
-        print("")

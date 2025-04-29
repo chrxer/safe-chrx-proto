@@ -8,5 +8,5 @@ def comment(matched_text:bytes) -> bytes:
 class PTC(BasePTC):
     def patch(self):
         # find testonly\s*=\s*true line
-        # comment that line
+        # comment that line (testonly targets cannot be used in builds)
         self.insert(rb'^\s*(testonly\s*=\s*true)', comment)

@@ -9,6 +9,7 @@ git diff --diff-filter=MD  > ../../os_crypt.patch
 
 """
 
+# just added for testing the patching framework, not really needed
 class PTC(BasePTC):
     def patch(self):
         # Prepends "add"
