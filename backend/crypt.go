@@ -1,4 +1,4 @@
-// for encrypted connection, similar implementation to /server/crypt.go
+// for encrypted connection, similar implementation to ./server/crypt.go
 package main
 
 import (

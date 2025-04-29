@@ -6,6 +6,7 @@
 		"${workspaceFolder}/scripts"
 	],
 	"python.defaultInterpreterPath":"${workspaceFolder}/scripts/.venv/bin/python",
+	"python.pipenvPath": "${workspaceFolder}/scripts/.venv",
 	"git.repositoryScanIgnoredFolders": [
 		"depot_tools",
 		"chromium"

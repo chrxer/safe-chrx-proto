@@ -16,6 +16,7 @@ import (
 	"time"
 )
 
+// make request to endpoint
 func _req(s []byte, port int, endpoint string) []byte {
 	endpoint_url := "http://localhost:" + strconv.Itoa(port) + "/" + endpoint
 	
@@ -23,7 +24,7 @@ func _req(s []byte, port int, endpoint string) []byte {
 		Timeout: 60 * time.Second,
 	}
 
-	// Try for maximum 10 s
+	// Try for maximum 60 s
 	start := time.Now()
 	var resp *http.Response
 	for time.Since(start).Seconds() < 60 {
@@ -83,7 +84,7 @@ func main() {
 	
 	encodedKey := base64.StdEncoding.EncodeToString(connKey)
 
-	// start the server
+	// start the server executable
 	if len(*serverPath) == 0 {
 		executablePath, err := os.Executable()
 		if err != nil {
