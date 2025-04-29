@@ -1,4 +1,4 @@
-#!scripts/.venv/bin/python3
+# generate arguments to compile chromium with
 
 from typing import Dict, List
 
@@ -11,7 +11,6 @@ API_KEYS = {
 
 
 def make(debug=False, gapi_keys:Dict[str, str]=API_KEYS) -> List[str]:
-
     if debug:
         dstr = "true"
         offbuild="false"

@@ -1,11 +1,11 @@
 #!scripts/.venv/bin/python3
+# setup constants (various paths & env's relative to this script's path)
 
 import pathlib
 import sys
 import os
 
 IS_LINUX = sys.platform in ["linux" , "linux2"]
-
 
 WRK=pathlib.Path(__file__).parent.parent.parent.resolve()
 

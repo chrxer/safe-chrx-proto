@@ -19,34 +19,6 @@ See [roadmap](roadmap/)
 
 see [CONTRIBUTING.md](CONTRIBUTING.md)
 
-<details>
-
-<summary>on EC2</summary>
-
-Build time without existing Ccache on EC2:
-```
-c5ad.2xlarge: 0.344 USD/h
-Compillation start: ~ 9 min. -> 0.05 USD
-CPU: ~ 99% during compilation
-~7 h -> 2.4 USD
-```
-
-with ccache:
-```
-Hits: 99.97%
-Errors: 0.03% (Could not read or parse input file:)
-Deps installed: ~ 11 min.
-50 min -> 0.29 USD
-```
-
-File sizes (131.0.6778.139)
-```
-Sources: 24G (downloaded from google server)
-Ccache:  3.4G (tar.gz archive => S3)
-```
-
-</details>
-
 ## Developers
 Integrated as a school-project \
 [@kaliiiiiiiiii](https://github.com/kaliiiiiiiiii) aka Steve (Single dev) \

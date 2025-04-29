@@ -7,7 +7,7 @@ See [chromium.version](chromium.version)
 
 ## Initial setup
 
-Currently for linux-only
+Currently for linux-only, building for or on windows has not been tested and will likely fail.
 
 clone this repo
 
@@ -38,13 +38,13 @@ sudo scripts/deps.bat
 
 Apply patches
 
-```
+```bash
 scripts/patch.py
 ```
 
 build
 
-```
+```bash
 scipts/build.py
 ```
 
@@ -52,7 +52,7 @@ scipts/build.py
 
 Run (after your edits)
 
-```
+```bash
 scripts/diff.py
 ```
 

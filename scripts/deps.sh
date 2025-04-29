@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# install deps for linux/ubuntu/deb
+
 # requires sudo!
 
 set -e
@@ -22,6 +24,7 @@ DEPOT="$WRK/depot_tools"
 export PATH="$DEPOT:$PATH"
 
 stmp() {
+    # timestamp
     date +"%m-%d %T"
 }
 
@@ -33,11 +36,13 @@ USER=$(awk -F: '$3 >= 1000 && $3 < 60000 {print $1; exit}' /etc/passwd)
 
 
 nsu() {
+    # run as sudo/root
     printf "\033[94m[EXC %s]\033[0m %s\n" "$(stmp)" "$*"
     sudo -u "$USER" env "PATH=$PATH" "$@"
 }
 
 asu() {
+    # run with regular user
     printf "\033[94m[EXC %s]\033[0m sudo %s\n" "$(stmp)" "$*"
     sudo env "PATH=$PATH" "$@"
 }
@@ -93,6 +98,7 @@ if [[ ! -d "$CHROMIUM/src" ]] || [[ "$FORCE" == "1" ]]; then
     gsync
 fi
 
+# patches//fixes
 # W: An error occurred during the signature verification
 # subprocess.CalledProcessError: Command '['sudo', 'apt-get', 'update']' returned non-zero exit status 100.
 set +e

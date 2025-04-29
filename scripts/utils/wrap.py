@@ -18,6 +18,7 @@ class CommandFailed(Exception):
         super().__init__(f"Command: {shlex.join(cmd)} failed with exit code {code}")
 
 def fmtpath(path:PathLike, base=WRK, _relpath=False) -> str:
+    # format path in a readable way (relative)
     try:
         if _relpath is True:
             return relpath(str(path), str(base))
@@ -34,6 +35,7 @@ def exists_in_PATH(target):
     paths = os.environ.get("PATH", "").split(os.pathsep)
     return any(os.path.abspath(target) == os.path.abspath(p) for p in paths)
 
+# execute a system command
 def exc(*cmd:Iterable[str],dbg:bool=True, _bytes:bool=False,timeout:float=None, cwd:PathLike=WRK, env:Dict[str, str]=os.environ, _pidx:int=0) -> Union[bytes, str]:
     stamp = datetime.datetime.now().strftime("%m-%d %H:%M:%S")
 
@@ -56,6 +58,7 @@ def exc(*cmd:Iterable[str],dbg:bool=True, _bytes:bool=False,timeout:float=None, 
         if _bytes:
             return proc.stdout.read()
         return proc.stdout.read().decode("utf-8")
-    
+
+# execute a python file
 def pyexc(*cmd:Iterable[str],dbg:bool=True, _bytes:bool=False,timeout:float=None, cwd:PathLike=WRK, _pidx:int=0, python:PathLike=PYTHON,env:Dict[str,str]=os.environ) -> Union[bytes, str]:
     return exc(str(python), *cmd, dbg=dbg, _bytes=_bytes, timeout=timeout, cwd=cwd, _pidx=_pidx+1, env=env)

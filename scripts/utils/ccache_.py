@@ -1,4 +1,5 @@
 #!scripts/.venv/bin/python3
+# wrapper for ccache
 
 from .wrap import exc
 from .initenv import GOOGLEENV

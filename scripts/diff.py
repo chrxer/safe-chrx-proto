@@ -8,10 +8,12 @@ import datetime
 from collections import Counter
 
 def diff():
-
+    # copy all to chromium/src added files to patch/chromium/src
+    # and write git diff to "diff.patch"
     stamp = datetime.datetime.now().strftime("%m-%d %H:%M:%S")
     print(f"\033[94m[MOD {stamp}]\033[0m creating git diff (excluding added files)")
 
+    # write git diff to "diff.patch"
     diff = exc("git","diff", "--diff-filter=MD","--patience", "--submodule=diff", cwd=SRC, _bytes=True, dbg=False, env=GOOGLEENV)
     with open(WRK.joinpath("diff.patch"), "wb") as f:
         f.seek(0)
@@ -21,12 +23,15 @@ def diff():
     stamp = datetime.datetime.now().strftime("%m-%d %H:%M:%S")
     print(f"\033[94m[MOD {stamp}]\033[0m copying added files to patch/chromium/src")
 
+    # all uncommited changes
     ls = exc("git", "ls-files", "--others", "--exclude-standard", "--exclude", "out", cwd=SRC, dbg=False, env=GOOGLEENV)
     untracked = ls.strip().split("\n") if ls else []
 
+    # all modified files
     ls = exc("git", "ls-files", "--modified", "--exclude-standard", "--exclude", "out", cwd=SRC, dbg=False, env=GOOGLEENV)
     modified = ls.strip().split("\n") if ls else []
 
+    # uncommited - modified = added files
     for file in (list((Counter(untracked) - Counter(modified)).elements())):
         dst_path:Path=PATCH.joinpath("chromium/src").joinpath(file)
 

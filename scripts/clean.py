@@ -4,6 +4,7 @@ from utils.fs import rmtree
 from utils import OUT, SRC
 from ptcx import patch as ptcxpatch
 
+# resets chromium/src
 def clean(_target=None):
     ptcxpatch.reset(SRC)
     if _target is not None:

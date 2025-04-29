@@ -7,6 +7,7 @@
 @ECHO off
 cls
 
+: # deps for Windows, not tested and probably missing stuff !!
 set "pv=3.11.0"
 set "ppath=%TEMP%/pyinstaller_%pv%.exe"
 set "log=%TEMP%/pyinstaller_%pv%.log"

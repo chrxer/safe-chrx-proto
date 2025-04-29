@@ -6,13 +6,18 @@ from utils.git_ import fcount
 from utils.fs import fsize, fmt
 from utils import SRC, WRK, ccache_
 
+# stats about ccache and chromium/src
+# example (excluding debug files)
+# Size of ./chromium/src
+# Size: 30.4GiB
+# Files: 461.0k
+# Avg size: 69.0KiB
 def show_stats():
     ccache_.show()
     
     size=0
-    if SRC.exists():
-        count = fcount(SRC)
-        size = fsize(SRC)
+    count = fcount(SRC)
+    size = fsize(SRC)
     avg_size = size / count if count > 0 else 0
 
     stamp = datetime.datetime.now().strftime("%m-%d %H:%M:%S")

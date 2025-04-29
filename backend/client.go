@@ -84,7 +84,7 @@ func main() {
 	
 	encodedKey := base64.StdEncoding.EncodeToString(connKey)
 
-	// start the server executable
+	// get the server executable path
 	if len(*serverPath) == 0 {
 		executablePath, err := os.Executable()
 		if err != nil {
@@ -97,8 +97,11 @@ func main() {
 	
 	var cmd *exec.Cmd
 	if len(*connBase64Key) == 0 {
+		// start server
 		cmd = exec.Command(*serverPath, fmt.Sprintf("--port=%d", *port))
 		cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true} // Ensure process can be killed by signal
+
+		// setup pipes
 		stdin, err := cmd.StdinPipe()
 		if err != nil {
 			fmt.Printf("Error setting up stdin pipe: %v\n", err)
@@ -119,6 +122,8 @@ func main() {
 			return
 		}
 
+
+		// write key to stin
 		_, err = stdin.Write([]byte(encodedKey + "\n"))
 		if err != nil {
 			// Print and return error

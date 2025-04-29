@@ -9,7 +9,7 @@ from utils import ccache_, DEPOT_TOOLS, OUT, SRC, mkargs, GOOGLEPYTHON, GOOGLEEN
 from utils.wrap import pyexc, exc
 from pack import pack_build
 
-
+# wraps gn
 def gn(outdir:str,target:str="chrome",debug:bool=False):
     # find root-target
     root_target=None
@@ -25,6 +25,7 @@ def gn(outdir:str,target:str="chrome",debug:bool=False):
         gnargs.append(f"--root-target={root_target}")
     pyexc(*gnargs, cwd=SRC, python=GOOGLEPYTHON, env=GOOGLEENV)
 
+# build golang backend server
 def build_server(outdir:str):
     build_dir = WRK.joinpath("backend/server")
     out_dir = SRC.joinpath(outdir)

@@ -26,6 +26,7 @@ def rmtree(path:PathLike):
         import shutil
         shutil.rmtree(path, ignore_errors=True)
 
+# read file from path
 def read(path:PathLike,_str:bool=True) -> Union[str, bytes]:
     with open(path, "rb") as f:
         if _str:

@@ -1,5 +1,7 @@
 #!scripts/.venv/bin/python3
 
+# wraps autotest
+
 import sys
 
 from build import gn, build_server

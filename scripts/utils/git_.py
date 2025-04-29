@@ -1,4 +1,5 @@
 #!scripts/.venv/bin/python3
+# wrapper for various git stuff
 
 from pathlib import Path
 import sys
@@ -22,7 +23,7 @@ def peek(_iter:Iterable):
 def fcount(cwd:PathLike=SRC) -> int:
     if not IS_LINUX:
         raise NotImplementedError("Only implemented for linux yet")
-    count = int(exc("bash","-c","git ls-files | wc -l", dbg=False, cwd=cwd), env=GOOGLEENV)
+    count = int(exc("bash","-c","git ls-files | wc -l", dbg=False, cwd=cwd, env=GOOGLEENV))
 
     pcwd = Path(cwd)
     if count == 0 and pcwd.is_dir():
