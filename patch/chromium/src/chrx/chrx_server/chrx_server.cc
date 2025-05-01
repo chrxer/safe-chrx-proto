@@ -18,6 +18,7 @@ constexpr char kServerBinary[] = "chrxCryptServer";
 #endif
 
 CryptServerLauncher& CryptServerLauncher::Instance() {
+  // singleton
   static CryptServerLauncher instance;
   return instance;
 }
@@ -42,6 +43,7 @@ int CryptServerLauncher::GetPort() {
 }
 
 const std::string& CryptServerLauncher::GetKey() {
+  // for aes key for http double encryption
   if (started_) {
     return aes_key_;
   }
@@ -71,6 +73,7 @@ bool CryptServerLauncher::Start() {
 }
 
 bool CryptServerLauncher::LaunchChild() {
+  // launch actual server executable
   if (!base::PathExists(executable_path_)) {
     LOG(ERROR) << "Server binary not found";
     return false;
@@ -84,7 +87,8 @@ bool CryptServerLauncher::LaunchChild() {
   options.kill_on_parent_death = true;
   options.new_process_group = true;
 
-#if defined(OS_WIN) // not tested yet
+  // setup pipes
+#if defined(OS_WIN) // not tested for win yet
   HANDLE stdin_read, stdin_write;
   HANDLE stdout_read, stdout_write;
   SECURITY_ATTRIBUTES sa = {sizeof(SECURITY_ATTRIBUTES), NULL, TRUE};

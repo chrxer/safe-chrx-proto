@@ -1,4 +1,3 @@
-// chrx/os_crypt_hook/os_crypt.h
 #pragma once
 #include <string>
 
