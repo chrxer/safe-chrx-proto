@@ -9,6 +9,10 @@ Chromium's native password manager is **poorly implemented** (see [password_harv
 ## How?
 Our password manager requires a **master password** when autofilling the first time after startup. All credentials are stored encrypted on the user's disk over that password.
 
+## Download
+A pre-release for Linux can be found at [Latest release](https://github.com/chrxer/safe-chrx-proto/releases/latest). \
+**Windows** is **not supported yet**
+
 ## Architecture
 ![Architecture](bridge.drawio.svg)
 
