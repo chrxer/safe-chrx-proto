@@ -128,6 +128,7 @@ bool CryptServerLauncher::LaunchChild() {
   constexpr int kMaxAttempts = 3;
   int attempts = 0;
 
+  // attempt writing the key to stdin
   while (written < static_cast<ssize_t>(key_b64.size()) && attempts < kMaxAttempts) {
     ssize_t result = write(parent_write.get(),
                           key_b64.data() + written,
@@ -153,6 +154,7 @@ bool CryptServerLauncher::LaunchChild() {
     return false;
   }
 
+  // check if server crashed
   int exit_code;
   if (server_process_.WaitForExitWithTimeout(base::Seconds(0), &exit_code)) {
     LOG(ERROR) << "Server died immediately: " << exit_code;
