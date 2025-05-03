@@ -16,7 +16,7 @@ A pre-release for Linux can be found at [Latest release](https://github.com/chrx
 ## Architecture
 ![Architecture](bridge.drawio.svg)
 
-For an overview on the applied changes inside Chromium, checkout [diff.patch](https://github.com/chrxer/safe-chrx-proto/blob/main/diff.patch)
+For an overview on the applied changes inside Chromium (excluding added files), checkout [diff.patch](https://github.com/chrxer/safe-chrx-proto/blob/main/diff.patch)
 
 ## Roadmap
 See [roadmap](roadmap/)
